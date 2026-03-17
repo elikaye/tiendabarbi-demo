@@ -1,0 +1,129 @@
+[
+  {
+    "id": 1,
+    "nombre": "Remera rosa",
+    "descripcion": "Remera de algodón para mujer",
+    "precio": 8000,
+    "imageUrl": "/product/producto1.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "mujer"
+  },
+  {
+    "id": 2,
+    "nombre": "Camisa clásica",
+    "descripcion": "Camisa manga larga para hombre",
+    "precio": 9500,
+    "imageUrl": "/product/producto2.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "hombre"
+  },
+  {
+    "id": 3,
+    "nombre": "Vestido estampado",
+    "descripcion": "Vestido verano para mujer",
+    "precio": 12000,
+    "imageUrl": "/product/producto3.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "mujer"
+  },
+  {
+    "id": 4,
+    "nombre": "Jean infantil",
+    "descripcion": "Pantalón de jean para niños",
+    "precio": 7000,
+    "imageUrl": "/product/producto4.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "niños"
+  },
+  {
+    "id": 5,
+    "nombre": "Conjunto Infantil",
+    "descripcion": "Conjunto cómodo para niños",
+    "precio": 17000,
+    "imageUrl": "/product/producto5.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "niños"
+  },
+  {
+    "id": 6,
+    "nombre": "Vestido Niña",
+    "descripcion": "Vestido con estampado floral",
+    "precio": 14000,
+    "imageUrl": "/product/producto6.jpg",
+    "categoria": "ropa",
+    "subcategoria": "niños"
+  },
+  {
+    "id": 7,
+    "nombre": "Blusa Blanca",
+    "descripcion": "Blusa fresca de verano",
+    "precio": 18000,
+    "imageUrl": "/product/producto2.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "mujer"
+  },
+  {
+    "id": 8,
+    "nombre": "Camisa Hombre",
+    "descripcion": "Camisa de vestir para hombre",
+    "precio": 16000,
+    "imageUrl": "/product/producto3.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "hombre"
+  },
+  {
+    "id": 9,
+    "nombre": "Remera Azul",
+    "descripcion": "Remera básica azul",
+    "precio": 15000,
+    "imageUrl": "/product/producto4.jpeg",
+    "categoria": "ropa",
+    "subcategoria": "hombre"
+  },
+
+  {
+  "id": 10,
+  "nombre": "Zapatilla urbana",
+  "precio": 22000,
+  "imageUrl": "/product/producto1.jpeg",
+  "categoria": "zapatos"
+},
+{
+  "id": 11,
+  "nombre": "Zapato cuero negro",
+  "precio": 28000,
+  "imageUrl": "/product/producto2.jpeg",
+  "categoria": "zapatos"
+},
+{
+  "id": 12,
+  "nombre": "Zapato cuero negro",
+  "precio": 28000,
+  "imageUrl": "/product/producto3.jpeg",
+  "categoria": "zapatos"
+},
+
+
+  {
+    "id": 13,
+    "nombre": "Lámpara de mesa",
+    "descripcion": "Ideal para escritorio o mesa de noche.",
+    "precio": 12000,
+    "imageUrl": "/product/producto1.jpeg",
+    "categoria": "hogar",
+    "subcategoria": "iluminación"
+  },
+  {
+    "id": 14,
+    "nombre": "Auriculares Bluetooth",
+    "descripcion": "Sonido envolvente con cancelación de ruido.",
+    "precio": 18000,
+    "imageUrl": "/product/producto2.jpeg",
+    "categoria": "electronica",
+    "subcategoria": "audio"
+  }
+]
+
+
+
+

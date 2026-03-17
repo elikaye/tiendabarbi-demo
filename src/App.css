@@ -1,0 +1,189 @@
+/* Variables de color */
+:root {
+  --color-rosa: #f5a8d2;
+  --color-lila: #d7c3f2;
+  --color-black: #000; 
+  --color-celeste: #c4f0ec;
+  --color-blanco: #ffffff;
+  --color-texto: #080808;
+  --color-hover: #080808;
+
+  --color-metal-gris-claro: #ccc;
+  --color-metal-gris-medio: #999;
+}
+
+
+/* Clase para texto metalizado animado */
+
+.text-metal {
+  background: linear-gradient(135deg, #ccc, #999, #ccc);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-move 4s ease-in-out infinite;
+}
+
+.text-glow {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animación de gradiente general para fondos */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 15s ease infinite;
+  background-size: 300% 300%;
+}
+
+/* Tipografías */
+h1, h2, h3 {
+  font-family: 'Marck Script', cursive;
+}
+
+p, a, li {
+  font-family: 'Quicksand', sans-serif;
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-blanco);
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-bottom: 2px solid var(--color-lila);
+}
+
+.logo {
+  font-family: 'Marck Script', cursive;
+  font-size: 2rem;
+  color: var(--color-lila);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: var(--color-texto);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+
+.nav-links li a:hover {
+  background-color: var(--color-hover);
+  color: var(--color-lila);
+}
+
+/* Footer */
+.footer {
+  position: relative;
+  padding: 2rem;
+  text-align: center;
+  color: white;
+  border-top: 2px solid violet;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    270deg,
+    #0a0a0a 0%,
+    #121212 25%,
+    #0a0a0a 50%,
+    #121212 75%,
+    #0a0a0a 100%
+  );
+  background-size: 400% 400%;
+  animation: wave 10s ease-in-out infinite;
+  opacity: 0.8;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.footer > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes wave {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Media query para navbar responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    background: var(--color-blanco);
+    padding: 1rem;
+    border-radius: 10px;
+    display: none; /* se puede mostrar con toggle en JS */
+  }
+}
+footer {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);
+}
+
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 10s linear infinite;
+}
