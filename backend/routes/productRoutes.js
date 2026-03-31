@@ -130,12 +130,6 @@ router.post('/', authenticate, upload.single('image'), validateProduct, async (r
       req.body.precio.toString().replace(/\./g,'').replace(',','.')
     );
 
-    const imagenes = req.body.imagenes
-      ? (typeof req.body.imagenes === "string"
-          ? JSON.parse(req.body.imagenes)
-          : req.body.imagenes)
-      : [];
-
     const newProduct = await Product.create({
 
       nombre:req.body.nombre,
@@ -148,10 +142,9 @@ router.post('/', authenticate, upload.single('image'), validateProduct, async (r
       medidas:req.body.medidas || null,
       destacados:req.body.destacados || false,
       estado:req.body.estado || 'activo',
-
       imageUrl,
       imagePublicId,
-      imagenes
+      temporada_coleccion: req.body.temporada_coleccion || null
 
     });
 
@@ -191,12 +184,6 @@ router.put('/:id', authenticate, upload.single('image'), loadProduct, validatePr
       req.body.precio.toString().replace(/\./g,'').replace(',','.')
     );
 
-    const imagenes = req.body.imagenes
-      ? (typeof req.body.imagenes === "string"
-          ? JSON.parse(req.body.imagenes)
-          : req.body.imagenes)
-      : req.product.imagenes;
-
     await req.product.update({
 
       nombre:req.body.nombre,
@@ -209,10 +196,9 @@ router.put('/:id', authenticate, upload.single('image'), loadProduct, validatePr
       medidas:req.body.medidas || null,
       destacados:req.body.destacados || false,
       estado:req.body.estado || 'activo',
-
       imageUrl,
       imagePublicId,
-      imagenes
+      temporada_coleccion: req.body.temporada_coleccion || req.product.temporada_coleccion
 
     });
 

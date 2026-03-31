@@ -1,4 +1,3 @@
-// src/components/Toast.jsx
 import React, { useEffect } from "react";
 
 const Toast = ({ message, show, onClose, duration = 2000 }) => {
@@ -14,7 +13,16 @@ const Toast = ({ message, show, onClose, duration = 2000 }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 bg-pink-600 text-white px-4 py-2 rounded shadow-lg transition-all duration-300">
+    <div
+      className="
+        fixed bottom-5 right-5 z-50
+        bg-pink-200 text-gray-700 font-medium
+        px-5 py-3
+        rounded-lg
+        shadow-md
+        animate-fade-in-up
+      "
+    >
       {message}
     </div>
   );

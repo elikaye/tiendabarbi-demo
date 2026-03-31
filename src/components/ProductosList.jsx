@@ -25,7 +25,7 @@ const chunkArray = (arr, chunkSize) => {
   return result;
 };
 
-export default function ProductosList() {
+export default function ProductosList({ start = 0, limit = MAX_PRODUCTOS }) {
   const [productos, setProductos] = useState([]);
   const [productosHome, setProductosHome] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,10 +33,12 @@ export default function ProductosList() {
 
   const { query } = useSearch();
 
+  // 🔥 query params
+  const params = new URLSearchParams(window.location.search);
+  const temporadaParam = params.get("temporada");
+
   const fetchProductos = async () => {
     try {
-      console.log("API_BASE_URL:", API_BASE_URL);
-
       const res = await fetch(`${API_BASE_URL}/products?limit=1000`);
       if (!res.ok) throw new Error("Error cargando productos");
 
@@ -53,8 +55,10 @@ export default function ProductosList() {
         precio: parseFloat(p.precio) || 0,
       }));
 
+      const mezclados = shuffle(adaptados);
+
       setProductos(adaptados);
-      setProductosHome(shuffle(adaptados).slice(0, MAX_PRODUCTOS));
+      setProductosHome(mezclados);
     } catch (err) {
       console.error("Error cargando productos:", err);
       setError("No se pudieron cargar los productos");
@@ -68,21 +72,36 @@ export default function ProductosList() {
   }, []);
 
   const productosFiltrados = useMemo(() => {
-    if (!query) return productosHome;
-    const q = normalizar(query);
-    return productos.filter(
-      (p) =>
-        normalizar(p.nombre).includes(q) ||
-        normalizar(p.categoria).includes(q)
-    );
-  }, [query, productos, productosHome]);
+    let lista = query ? productos : productosHome;
+
+    // 🔍 búsqueda
+    if (query) {
+      const q = normalizar(query);
+      lista = lista.filter(
+        (p) =>
+          normalizar(p.nombre).includes(q) ||
+          normalizar(p.categoria).includes(q)
+      );
+    }
+
+    // 🔥 FIX TEMPORADA
+    if (temporadaParam) {
+      lista = lista.filter(
+        (p) => p.temporada_coleccion === temporadaParam
+      );
+    }
+
+    return lista;
+  }, [query, productos, productosHome, temporadaParam]);
+
+  const productosRender = productosFiltrados.slice(start, start + limit);
 
   if (error) {
     return <p className="text-center mt-10 text-red-600">{error}</p>;
   }
 
   return (
-    <div className="bg-pink-100 min-h-screen py-6 px-4">
+    <div className="bg-white py-6 px-4">
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array(8)
@@ -94,16 +113,15 @@ export default function ProductosList() {
               />
             ))}
         </div>
-      ) : productosFiltrados.length === 0 ? (
+      ) : productosRender.length === 0 ? (
         <p className="text-center text-gray-600 text-lg mt-10">
-          No se encontraron productos para{" "}
-          <span className="font-semibold">“{query}”</span>
+          No hay productos disponibles
         </p>
       ) : (
         <>
           {/* MOBILE */}
           <div className="sm:hidden space-y-4">
-            {chunkArray(productosFiltrados, COLUMNAS_MOBILE).map(
+            {chunkArray(productosRender, COLUMNAS_MOBILE).map(
               (filaProductos, index) => (
                 <div
                   key={index}
@@ -126,7 +144,7 @@ export default function ProductosList() {
 
           {/* DESKTOP */}
           <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productosFiltrados.map((p) => (
+            {productosRender.map((p) => (
               <ProductoCard key={p.id} producto={p} />
             ))}
           </div>

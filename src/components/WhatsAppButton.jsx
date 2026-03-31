@@ -9,7 +9,7 @@ export default function WhatsAppButton() {
       rel="noopener noreferrer"
       className="fixed bottom-16 right-4 z-50"
     >
-      <div className="flex items-center justify-center w-14 h-14 bg-pink-400 text-white rounded-full shadow-lg hover:shadow-pink hover:bg-black transition-all duration-300 hover:scale-105">
+      <div className="flex items-center justify-center w-14 h-14 bg-pink-200 text-white rounded-full shadow-lg  hover:bg-blue-200 transition-all duration-300 hover:scale-105">
         <FaWhatsapp size={28} className="text-white" />
       </div>
     </a>

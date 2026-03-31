@@ -1,4 +1,4 @@
-// src/components/admin/Auth.jsx
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -35,7 +35,6 @@ const Auth = () => {
 
       login(user, token);
 
-      // 🔹 Redirección segura
       if (user.rol === "admin") {
         navigate("/admin", { replace: true });
       } else {
@@ -57,27 +56,29 @@ const Auth = () => {
   };
 
   return (
-    <div className="bg-gray-100 px-4 pt-20 sm:pt-24 pb-12 min-h-screen">
+    <div className="bg-gray-100 px-4 pt-20 sm:pt-24 pb-12 min-h-screen text-gray-700 font-medium">
       <div className="mx-auto w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-semibold text-center mb-6">
+        
+        <h2 className="text-2xl font-medium text-center mb-6">
           Iniciar sesión
         </h2>
 
         {errorMsg && (
-          <p className="text-red-600 text-center mb-4 text-sm">
+          <p className="text-red-400 text-center mb-4 text-sm">
             {errorMsg}
           </p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          
           {/* EMAIL */}
           <div>
-            <label className="block font-body font-semibold mb-1">
+            <label className="block font-medium mb-1">
               Email
             </label>
             <input
               type="email"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -87,13 +88,13 @@ const Auth = () => {
 
           {/* PASSWORD */}
           <div>
-            <label className="block font-body font-semibold mb-1">
+            <label className="block font-medium mb-1">
               Contraseña
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -101,7 +102,7 @@ const Auth = () => {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
                 {showPassword ? "Ocultar" : "Mostrar"}
@@ -109,11 +110,11 @@ const Auth = () => {
             </div>
           </div>
 
-          {/* RECUPERAR CONTRASEÑA */}
+          {/* RECUPERAR */}
           <div className="text-right">
             <Link
               to="/forgot-password"
-              className="text-sm text-pink-500 font-body font-semibold hover:underline"
+              className="text-sm text-pink-300 font-medium hover:underline"
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -123,7 +124,7 @@ const Auth = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-pink-500 active:bg-black transition-colors text-white font-body font-semibold py-3 rounded-lg disabled:opacity-60"
+            className="w-full bg-pink-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-pink-300 transition disabled:opacity-60"
           >
             {loading ? "Ingresando..." : "Iniciar sesión"}
           </button>
@@ -133,11 +134,12 @@ const Auth = () => {
             ¿No tenés cuenta?{" "}
             <Link
               to="/register"
-              className="text-pink-500 font-body font-semibold"
+              className="text-blue-300 font-medium hover:underline"
             >
               Registrate
             </Link>
           </p>
+
         </form>
       </div>
     </div>

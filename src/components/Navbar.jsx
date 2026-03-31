@@ -1,72 +1,53 @@
+// src/components/Navbar.jsx
 import React, { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { FaBars, FaTimes, FaUserCircle, FaShoppingCart } from "react-icons/fa";
-import { LayoutDashboard, Heart, Search } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { LayoutDashboard, Heart, Search, ShoppingBag, LogOut } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
 import { useSearch } from "../context/SearchContext";
 import { useFavoritos } from "../context/FavoritosContext";
 import { useAuth } from "../context/AuthContext";
+import { useFrontendSettings } from "../context/FrontendSettingsContext";
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [localQuery, setLocalQuery] = useState("");
-  const [activeSection, setActiveSection] = useState("/");
-  const [hovered, setHovered] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(null);
+  const [hideTopBar, setHideTopBar] = useState(false);
 
   const { carrito } = useCart();
   const { favoritos } = useFavoritos();
   const { setQuery } = useSearch();
   const { user, logout } = useAuth();
 
+  const { settings } = useFrontendSettings();
+  const { cintaTexto, cintaVisible } = settings;
+
   const navigate = useNavigate();
-  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHideTopBar(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const secciones = [
     ["Inicio", "/"],
-    ["Ropa de dama", "/ropa-dama"],
-    ["Ropa de hombre", "/ropa-hombre"],
-    ["Calzados", "/calzados"],
-    ["Bazar", "/bazar"],
-    ["Maquillaje", "/maquillaje"],
-    ["Blanquería", "/blanqueria"],
-    ["Artículos de temporada", "/articulos-de-temporada"],
+    ["Ropa de nena", "/ropa-nena"],
+    ["Ropa de nene", "/ropa-nene"],
+    ["Bebés", "/bebes"],
+    ["Accesorios", "/accesorios"],
   ];
 
   const subcategorias = {
-    "/ropa-dama": [
-      "Remeras y camisetas",
-      "Pantalones y jeans",
-      "Buzos y camperas",
-      "Shores y conjuntos",
-      "Otros",
-    ],
-    "/ropa-hombre": [
-      "Remeras y camisetas",
-      "Joggins y jeans",
-      "Buzos y camperas",
-      "Shores y conjuntos",
-      "Otros",
-    ],
-    "/calzados": [
-      "Borcegos",
-      "Zapatillas de adultos",
-      "Zapatillas de niños",
-      "Ojotas y pantuflas",
-      "Sandalias",
-    ],
-  };
-
-  useEffect(() => {
-    setActiveSection(location.pathname);
-  }, [location.pathname]);
-
-  const handleLogout = () => {
-    logout();
-    setMenuOpen(false);
-    navigate("/");
+    "/ropa-nena": ["Remeras y Camisetas", "Pantalones", "Camperas y buzos", "Shorts y polleras", "Conjuntos", "Vestidos", "otros"],
+    "/ropa-nene": ["Remeras y Camisetas", "Pantalones", "Camperas y buzos", "Shorts y Bermudas", "Conjuntos", "otros"],
+    "/bebes": ["Bodys", "Enteritos", "Conjuntos", "Abrigos", "Otros"],
+    "/accesorios": ["Gorros", "Medias", "Baberos", "Binchas y Colitas", "Otros"],
   };
 
   const handleSearchSubmit = (e) => {
@@ -74,141 +55,158 @@ function Navbar() {
     const q = localQuery.trim();
     setQuery(q);
     setShowSearch(false);
-    setMenuOpen(false);
     if (!q) navigate("/");
     else navigate("/search");
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-pink-500/70 backdrop-blur-md shadow-md text-white">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2">
-        {/* MENÚ DESKTOP */}
-        <nav className="hidden md:flex gap-8 font-bold text-sm relative">
-          {secciones.map(([label, to]) => (
-            <div
-              key={to}
-              onMouseEnter={() => setHovered(to)}
-              onMouseLeave={() => setHovered(null)}
-              className="relative flex flex-col items-start"
-            >
-              <NavLink
-                to={to}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 transition ${
-                    isActive ? "text-white" : "text-white hover:text-pink-300"
-                  }`
-                }
-              >
-                <span className="w-2 h-2 rounded-full bg-white" />
-                {label}
-              </NavLink>
+    <header className="fixed top-0 left-0 w-full z-50">
 
-              {hovered === to && subcategorias[to] && (
-                <div className="absolute top-full left-0 pt-2 bg-pink-500/80 shadow-lg rounded-md py-2 px-4 z-50 min-w-[220px]">
-                  {subcategorias[to].map((sub) => (
-                    <Link
-                      key={sub}
-                      to={`${to}?subcategoria=${encodeURIComponent(sub)}`}
-                      className="block px-2 py-1 text-sm text-white hover:bg-pink-600 rounded"
-                    >
-                      {sub}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
+      {/* 🔔 CINTA */}
+      {cintaVisible && cintaTexto && (
+        <div
+          className={`
+            w-full text-white text-sm overflow-hidden
+            bg-primary
+            transition-all duration-300
+            ${hideTopBar ? "max-h-0 py-0 opacity-0" : "max-h-20 py-2 opacity-100"}
+          `}
+        >
+          <div className="flex w-max animate-marquee">
+            <span className="px-20 whitespace-pre">{cintaTexto}</span>
+            <span className="px-20 whitespace-pre">{cintaTexto}</span>
+          </div>
+        </div>
+      )}
 
-        {/* ICONOS */}
-        <div className="flex items-center gap-4 relative md:justify-end w-full md:w-auto">
-          {/* HAMBURGUESA */}
+      {/* NAVBAR */}
+      <div className="bg-white/90 backdrop-blur-md shadow-sm">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+
+          {/* 🍔 */}
           <button
-            className="md:hidden text-xl text-white mr-auto"
-            onClick={() => {
-              setMenuOpen(!menuOpen);
-              setShowSearch(false);
-            }}
+            className="md:hidden text-xl text-gray-700"
+            onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
 
-          {/* BUSCADOR */}
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <Search
-              size={22}
-              onClick={() => setShowSearch(!showSearch)}
-              className="cursor-pointer text-white hover:text-pink-300"
-            />
-            {showSearch && (
-              <input
-                type="text"
-                placeholder="Buscar..."
-                value={localQuery}
-                onChange={(e) => setLocalQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSearchSubmit(e);
-                }}
-                className="absolute top-full mt-2 right-0 w-44 px-3 py-1 rounded text-sm shadow-md focus:outline-none z-50 text-black"
-                autoFocus
+          {/* DESKTOP */}
+          <nav className="hidden md:flex gap-10 font-medium text-lg text-gray-700">
+            {secciones.map(([label, to]) => (
+              <div key={to} className="relative group">
+
+                <NavLink to={to}>{label}</NavLink>
+
+                {/* MEGA MENU */}
+                {subcategorias[to] && (
+                  <div className="absolute left-0 top-full mt-2 bg-white/80 backdrop-blur-md shadow-lg rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+
+                    <div className="flex">
+
+                      <div className="p-6 min-w-[220px] flex flex-col gap-3">
+                        {subcategorias[to].map((sub) => (
+                          <Link
+                            key={sub}
+                            to={`${to}?subcategoria=${encodeURIComponent(sub)}`}
+                            className="text-sm hover:text-primary"
+                          >
+                            {sub}
+                          </Link>
+                        ))}
+                      </div>
+
+                      <div className="hidden md:flex items-center justify-center p-4 w-[160px]">
+                        <img
+                          src="/tienda_infantil.png"
+                          alt="logo"
+                          className="w-[100px] h-[100px] object-contain opacity-80"
+                        />
+                      </div>
+
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            ))}
+          </nav>
+
+          {/* ICONOS */}
+          <div className="flex items-center gap-4 relative text-gray-700">
+
+            {/* 🔍 LUPA (intacta) */}
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <Search
+                className="cursor-pointer hover:text-primary"
+                onClick={() => setShowSearch(!showSearch)}
               />
+
+              {showSearch && (
+                <input
+                  type="text"
+                  value={localQuery}
+                  onChange={(e) => setLocalQuery(e.target.value)}
+                  placeholder="Buscar..."
+                  className="fixed top-[80px] left-1/2 -translate-x-1/2 w-[90%] max-w-sm px-4 py-2 bg-white border border-gray-300 rounded shadow z-[999]"
+                />
+              )}
+            </form>
+
+            <NavLink to="/favoritos" className="relative">
+              <Heart className="hover:text-primary" />
+              {favoritos.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-pink-200 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                  {favoritos.length}
+                </span>
+              )}
+            </NavLink>
+
+            <NavLink to="/carrito" className="relative">
+              <ShoppingBag className="hover:text-primary" />
+              {carrito.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-blue-200 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                  {carrito.length}
+                </span>
+              )}
+            </NavLink>
+
+            {user?.rol === "admin" && (
+              <button onClick={() => navigate("/admin")}>
+                <LayoutDashboard className="hover:text-primary" />
+              </button>
             )}
-          </form>
 
-          {/* FAVORITOS */}
-          <NavLink to="/favoritos" className="relative text-xl text-white">
-            <Heart className="hover:text-pink-300" />
-            {favoritos.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-pink-300 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {favoritos.length}
-              </span>
+            {/* 🔥 LOGOUT ICONO */}
+            {user ? (
+              <button onClick={logout} className="hover:text-primary">
+                <LogOut size={20} />
+              </button>
+            ) : (
+              <Link to="/auth">
+                <FaUserCircle className="hover:text-primary" />
+              </Link>
             )}
-          </NavLink>
-
-          {/* CARRITO */}
-          <NavLink to="/carrito" className="relative text-xl text-white">
-            <FaShoppingCart className="hover:text-pink-300" />
-            {carrito.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-pink-300 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {carrito.length}
-              </span>
-            )}
-          </NavLink>
-
-          {/* ADMIN */}
-          {user?.rol === "admin" && (
-            <button onClick={() => navigate("/admin")}>
-              <LayoutDashboard className="text-white hover:text-pink-300" />
-            </button>
-          )}
-
-          {/* LOGIN / LOGOUT */}
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="text-xs font-bold text-white hover:text-pink-300"
-            >
-              Cerrar
-              <br />
-              sesión
-            </button>
-          ) : (
-            <Link to="/auth">
-              <FaUserCircle className="text-xl text-white hover:text-pink-300" />
-            </Link>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* MENÚ MOBILE */}
+      {/* MOBILE */}
       {menuOpen && (
-        <nav className="md:hidden bg-pink-500/70 backdrop-blur-md px-6 py-4 flex flex-col gap-3 font-bold text-white">
+        <div className="md:hidden bg-white px-6 py-4 shadow-md flex flex-col gap-3 relative">
+
+          <img
+            src="/tienda_infantil.png"
+            alt="logo"
+            className="absolute right-4 top-4 w-12 h-12 object-contain opacity-70"
+          />
+
           {secciones.map(([label, to]) => (
             <div key={to} className="flex flex-col">
-              <div
-                className={`flex items-center justify-between cursor-pointer ${
-                  activeSection === to ? "text-white" : "text-white"
-                }`}
+
+              {/* 🔥 FIX NAVLINK */}
+              <NavLink
+                to={to}
                 onClick={() => {
                   if (subcategorias[to]) {
                     setMobileOpen(mobileOpen === to ? null : to);
@@ -217,37 +215,60 @@ function Navbar() {
                     setMenuOpen(false);
                   }
                 }}
+                className={({ isActive }) =>
+                  `flex justify-between items-center cursor-pointer text-lg
+                  ${
+                    isActive
+                      ? "text-primary font-semibold"
+                      : "text-gray-700 hover:text-primary"
+                  }`
+                }
               >
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      activeSection === to ? "bg-white" : "bg-white"
-                    }`}
-                  />
-                  {label}
-                </div>
+                <span>{label}</span>
                 {subcategorias[to] && (
-                  <span className="text-xs">{mobileOpen === to ? "−" : "+"}</span>
+                  <span>{mobileOpen === to ? "−" : "+"}</span>
                 )}
-              </div>
+              </NavLink>
 
               {subcategorias[to] && mobileOpen === to && (
-                <div className="flex flex-col pl-5 mt-1 gap-1">
+                <div className="pl-4 mt-2 flex flex-col gap-2">
                   {subcategorias[to].map((sub) => (
-                    <Link
+                    <NavLink
                       key={sub}
                       to={`${to}?subcategoria=${encodeURIComponent(sub)}`}
-                      className="text-sm text-white hover:text-pink-300"
                       onClick={() => setMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `text-sm ${
+                          isActive
+                            ? "text-primary font-semibold"
+                            : "text-gray-700 hover:text-primary"
+                        }`
+                      }
                     >
                       {sub}
-                    </Link>
+                    </NavLink>
                   ))}
                 </div>
               )}
+
             </div>
           ))}
-        </nav>
+
+          {/* LOGOUT MOBILE */}
+          {user && (
+            <button
+              onClick={() => {
+                logout();
+                setMenuOpen(false);
+              }}
+              className="mt-3 flex items-center gap-2 text-grey-700 hover:text-primary"
+            >
+              <LogOut size={20} />
+              <span className="text-sm">Salir</span>
+            </button>
+          )}
+
+        </div>
       )}
     </header>
   );

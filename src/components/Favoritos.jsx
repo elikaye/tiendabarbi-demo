@@ -1,4 +1,3 @@
-// src/components/Favoritos.jsx
 import React, { useEffect, useState } from "react";
 import { useFavoritos } from "../context/FavoritosContext";
 import ProductoCard from "./ProductoCard";
@@ -21,7 +20,6 @@ const Favoritos = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Maneja la eliminación con control de estado para evitar el bug
   const handleEliminar = async (productoId) => {
     if (syncingIds.includes(productoId)) return;
 
@@ -35,30 +33,42 @@ const Favoritos = () => {
     }
   };
 
-  if (!Array.isArray(favoritos)) return <p className="p-4">Cargando favoritos...</p>;
+  if (!Array.isArray(favoritos)) {
+    return (
+      <div className="min-h-screen pt-32 md:pt-36 px-4 bg-white text-gray-700 font-medium">
+        <p>Cargando favoritos...</p>
+      </div>
+    );
+  }
 
-  const favoritosFiltrados = favoritos.filter((p) => !syncingIds.includes(p.id));
+  const favoritosFiltrados = favoritos.filter(
+    (p) => !syncingIds.includes(p.id)
+  );
 
-  if (!favoritosFiltrados.length) return <p className="p-4">No tenés productos favoritos aún.</p>;
+  if (!favoritosFiltrados.length) {
+    return (
+      <div className="min-h-screen pt-32 md:pt-36 px-4 bg-white flex flex-col items-center justify-center text-gray-700 font-medium">
+        <p className="text-lg">No tenés productos favoritos aún 💖</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-6">Mis Favoritos ❤️</h2>
+    <div className="min-h-screen pt-32 md:pt-36 pb-20 px-4 bg-white text-gray-700">
+      
+      <h2 className="text-2xl font-medium mb-6 text-gray-700 text-center md:text-left">
+        Mis Favoritos
+      </h2>
 
-      {/* 📱 MOBILE — scroll horizontal por filas */}
+      {/* 📱 MOBILE */}
       <div className="sm:hidden space-y-4">
         {chunkArray(favoritosFiltrados, COLUMNAS_MOBILE).map((fila, index) => (
           <div
             key={index}
-            className="flex space-x-4 overflow-x-auto pb-2"
-            style={{ scrollSnapType: "x mandatory" }}
+            className="flex gap-4 overflow-x-auto pb-2 pr-2"
           >
             {fila.map((producto) => (
-              <div
-                key={producto.id}
-                className="flex-shrink-0 w-64"
-                style={{ scrollSnapAlign: "start" }}
-              >
+              <div key={producto.id} className="flex-shrink-0 w-64">
                 <ProductoCard
                   producto={producto}
                   onEliminar={() => handleEliminar(producto.id)}
@@ -70,7 +80,7 @@ const Favoritos = () => {
         ))}
       </div>
 
-      {/* 🖥 DESKTOP — grid normal */}
+      {/* 🖥 DESKTOP */}
       <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {favoritosFiltrados.map((producto) => (
           <ProductoCard

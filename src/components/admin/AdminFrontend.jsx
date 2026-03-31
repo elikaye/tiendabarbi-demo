@@ -13,7 +13,7 @@ const AdminFrontend = () => {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     setLocalSettings(settings);
@@ -58,6 +58,7 @@ const AdminFrontend = () => {
         bannerBlur: Boolean(localSettings.bannerBlur),
         cintaTexto: localSettings.cintaTexto || "",
         cintaVisible: localSettings.cintaVisible ?? true,
+        miniBanners: localSettings.miniBanners || [],
       };
 
       const res = await axios.put(
@@ -70,14 +71,13 @@ const AdminFrontend = () => {
         bannerBlur: Boolean(res.data.bannerBlur),
         cintaTexto: res.data.cintaTexto || "",
         cintaVisible: res.data.cintaVisible ?? true,
+        miniBanners: res.data.miniBanners || [],
       };
 
       updateSettings(updated);
       setLocalSettings(updated);
 
       setSuccessMessage("Cambios aplicados correctamente");
-
-      // Se limpia solo (mejor UX para demo)
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.error(err);
@@ -98,7 +98,6 @@ const AdminFrontend = () => {
         <label className="block text-sm font-medium mb-1">
           Subir banner
         </label>
-
         <input
           type="file"
           accept="image/*"
@@ -106,22 +105,16 @@ const AdminFrontend = () => {
           className="w-full border rounded p-2"
         />
 
-        {uploading && (
-          <p className="text-sm text-gray-500 mt-1">Subiendo…</p>
-        )}
+        {uploading && <p className="text-sm text-gray-500 mt-1">Subiendo…</p>}
 
-        {/* Preview banner con blur SOLO de relleno */}
         {localSettings.bannerUrl && (
           <div className="relative mt-4 h-48 w-full overflow-hidden rounded bg-black">
             {localSettings.bannerBlur && (
               <div
                 className="absolute inset-0 bg-center bg-cover blur-2xl scale-110"
-                style={{
-                  backgroundImage: `url(${localSettings.bannerUrl})`,
-                }}
+                style={{ backgroundImage: `url(${localSettings.bannerUrl})` }}
               />
             )}
-
             <div className="relative z-10 w-full h-full flex items-center justify-center">
               <img
                 src={localSettings.bannerUrl}
@@ -139,9 +132,7 @@ const AdminFrontend = () => {
         <input
           type="checkbox"
           checked={Boolean(localSettings.bannerBlur)}
-          onChange={(e) =>
-            handleChange("bannerBlur", e.target.checked)
-          }
+          onChange={(e) => handleChange("bannerBlur", e.target.checked)}
         />
         <span>Blur en los costados del banner</span>
       </div>
@@ -154,11 +145,8 @@ const AdminFrontend = () => {
         <input
           type="text"
           value={localSettings.cintaTexto || ""}
-          onChange={(e) =>
-            handleChange("cintaTexto", e.target.value)
-          }
+          onChange={(e) => handleChange("cintaTexto", e.target.value)}
           className="w-full border rounded p-2"
-          placeholder="Ej: 30% OFF en toda la tienda"
         />
       </div>
 
@@ -167,39 +155,152 @@ const AdminFrontend = () => {
         <input
           type="checkbox"
           checked={localSettings.cintaVisible}
-          onChange={(e) =>
-            handleChange("cintaVisible", e.target.checked)
-          }
+          onChange={(e) => handleChange("cintaVisible", e.target.checked)}
         />
         <span>Mostrar cinta informativa</span>
       </div>
 
       {/* Preview cinta */}
       {localSettings.cintaVisible && localSettings.cintaTexto && (
-        <div className="mb-6 overflow-hidden bg-pink-500/70 text-black py-2 px-4 font-medium whitespace-nowrap backdrop-blur-sm">
+        <div className="mb-6 overflow-hidden bg-[#6f7f66]/85 text-black py-2 px-4 font-medium whitespace-nowrap backdrop-blur-sm">
           <div className="inline-block animate-marquee">
             {`${localSettings.cintaTexto} • `.repeat(8)}
           </div>
         </div>
       )}
 
-      {/* Feedback visual */}
-      {successMessage && (
-        <p className="mb-4 text-pink-500 font-medium">
-          {successMessage}
-        </p>
-      )}
+      {/* 🔥 MINI BANNERS */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3">Mini Banners</h3>
 
-      {errorMessage && (
-        <p className="mb-4 text-red-600 font-medium">
-          {errorMessage}
-        </p>
-      )}
+        {localSettings.miniBanners?.map((banner, index) => (
+          <div key={index} className="border p-3 rounded mb-3 flex flex-col gap-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+                const res = await fetch(
+                  `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                  { method: "POST", body: formData }
+                );
+                const data = await res.json();
+
+                const updated = [...localSettings.miniBanners];
+                updated[index].imagen = data.secure_url;
+
+                setLocalSettings((prev) => ({
+                  ...prev,
+                  miniBanners: updated,
+                }));
+              }}
+            />
+
+            {banner.imagen && (
+              <img src={banner.imagen} className="h-24 object-cover rounded" />
+            )}
+
+            <input
+              type="text"
+              placeholder="Texto"
+              value={banner.texto || ""}
+              onChange={(e) => {
+                const updated = [...localSettings.miniBanners];
+                updated[index].texto = e.target.value;
+                setLocalSettings((prev) => ({ ...prev, miniBanners: updated }));
+              }}
+              className="border rounded p-2"
+            />
+
+            {/* Categoría */}
+            <select
+              value={banner.categoria || ""}
+              onChange={(e) => {
+                const updated = [...localSettings.miniBanners];
+                updated[index].categoria = e.target.value;
+                setLocalSettings((prev) => ({ ...prev, miniBanners: updated }));
+              }}
+              className="border rounded p-2"
+            >
+              <option value="">-- Categoría --</option>
+              <option value="ropa-nene">Ropa de nene</option>
+              <option value="ropa-nena">Ropa de nena</option>
+              <option value="bebes">Bebés</option>
+              <option value="accesorios">Accesorios</option>
+            </select>
+
+            {/* Subcategoría */}
+            <input
+              type="text"
+              placeholder="Subcategoría"
+              value={banner.subcategoria || ""}
+              onChange={(e) => {
+                const updated = [...localSettings.miniBanners];
+                updated[index].subcategoria = e.target.value;
+                setLocalSettings((prev) => ({ ...prev, miniBanners: updated }));
+              }}
+              className="border rounded p-2"
+            />
+
+            {/* Temporada */}
+            <select
+              value={banner.temporada || ""}
+              onChange={(e) => {
+                const updated = [...localSettings.miniBanners];
+                updated[index].temporada = e.target.value;
+                setLocalSettings((prev) => ({ ...prev, miniBanners: updated }));
+              }}
+              className="border rounded p-2"
+            >
+              <option value="">-- Temporada --</option>
+              <option value="otoño-invierno">Otoño-Invierno</option>
+              <option value="primavera-verano">Primavera-Verano</option>
+              <option value="nueva">Nueva colección</option>
+              <option value="ofertas">Oferta</option>
+            </select>
+
+            <button
+              onClick={() => {
+                const updated = localSettings.miniBanners.filter((_, i) => i !== index);
+                setLocalSettings((prev) => ({ ...prev, miniBanners: updated }));
+              }}
+              className="text-red-500 text-sm"
+            >
+              Eliminar
+            </button>
+          </div>
+        ))}
+
+        <button
+          onClick={() =>
+            setLocalSettings((prev) => ({
+              ...prev,
+              miniBanners: [
+                ...(prev.miniBanners || []),
+                { imagen: "", texto: "", categoria: "", subcategoria: "", temporada: "" },
+              ],
+            }))
+          }
+          className="bg-gray-200 px-3 py-1 rounded"
+        >
+          + Agregar banner
+        </button>
+      </div>
+
+      {/* Feedback */}
+      {successMessage && <p className="mb-4 text-pink-200 font-medium">{successMessage}</p>}
+      {errorMessage && <p className="mb-4 text-blue-200 font-medium">{errorMessage}</p>}
 
       <button
         onClick={handleApplyChanges}
         disabled={saving}
-        className="bg-black text-white px-4 py-2 rounded hover:opacity-90 disabled:opacity-60"
+        className="bg-pink-200 text-bg-grey-700 px-4 py-2 rounded hover:opacity-90"
       >
         {saving ? "Guardando…" : "Aplicar cambios"}
       </button>

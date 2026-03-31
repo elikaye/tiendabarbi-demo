@@ -8,7 +8,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-body font-semibold mb-6">
+      <h1 className="text-3xl font-medium mb-6">
         Panel de Administración
       </h1>
 
@@ -16,10 +16,10 @@ const AdminDashboard = () => {
       <div className="flex gap-4 mb-6 border-b">
         <button
           onClick={() => setTab("productos")}
-          className={`py-2 px-4 font-body transition ${
+          className={`py-2 px-4 font-medium transition ${
             tab === "productos"
-              ? "border-b-2 border-pink-500 text-pink-500"
-              : "text-gray-600 hover:text-gray-800"
+              ? "border-b-2 border-pink-200 text-pink-300"
+              : "text-gray-700 hover:text-gray-800"
           }`}
         >
           Productos
@@ -27,10 +27,10 @@ const AdminDashboard = () => {
 
         <button
           onClick={() => setTab("usuarios")}
-          className={`py-2 px-4 font-body transition ${
+          className={`py-2 px-4 font-medium transition ${
             tab === "usuarios"
-              ? "border-b-2 border-pink-500 text-pink-500"
-              : "text-gray-600 hover:text-gray-800"
+              ? "border-b-2 border-pink-200 text-pink-300"
+              : "text-gray-700 hover:text-gray-800"
           }`}
         >
           Usuarios
@@ -38,10 +38,10 @@ const AdminDashboard = () => {
 
         <button
           onClick={() => setTab("frontend")}
-          className={`py-2 px-4 font-body transition ${
+          className={`py-2 px-4 font-medim transition ${
             tab === "frontend"
-              ? "border-b-2 border-pink-500 text-pink-500"
-              : "text-gray-600 hover:text-gray-800"
+              ? "border-b-2 border-pink-200 text-pink-300"
+              : "text-gray-700 hover:text-gray-800"
           }`}
         >
           Frontend

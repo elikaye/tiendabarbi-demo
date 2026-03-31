@@ -1,5 +1,3 @@
-// src/components/admin/Register.jsx
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -53,56 +51,58 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-gray-100 px-4 pt-20 sm:pt-24 pb-12">
+    <div className="bg-gray-100 px-4 pt-20 sm:pt-24 pb-12 min-h-screen text-gray-700 font-medium">
       <div className="mx-auto w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-body font-semibold text-center mb-6">
+
+        <h2 className="text-2xl font-medium text-center mb-6">
           Registrarse
         </h2>
 
         {errorMsg && (
-          <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-center text-sm">
+          <div className="bg-red-100 text-red-400 p-2 rounded mb-4 text-center text-sm">
             {errorMsg}
           </div>
         )}
 
         {successMsg && (
-          <div className="bg-green-100 text-green-700 p-2 rounded mb-4 text-center text-sm">
+          <div className="bg-green-100 text-green-600 p-2 rounded mb-4 text-center text-sm">
             {successMsg}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
           {/* NOMBRE */}
           <div>
-            <label className="block font-body font-semibold mb-1">
+            <label className="block font-medium mb-1">
               Nombre completo
             </label>
             <input
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200"
               required
             />
           </div>
 
           {/* EMAIL */}
           <div>
-            <label className="block font-body font-semibold mb-1">
+            <label className="block font-medium mb-1">
               Correo electrónico
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200"
               required
             />
           </div>
 
           {/* PASSWORD */}
           <div>
-            <label className="block font-body font-semibold mb-1">
+            <label className="block font-medium mb-1">
               Contraseña
             </label>
             <div className="relative">
@@ -110,13 +110,13 @@ const Register = () => {
                 type={mostrarPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200"
                 required
               />
               <button
                 type="button"
                 onClick={() => setMostrarPassword(!mostrarPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-pink-500"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
                 {mostrarPassword ? (
                   <RiEyeOffLine size={22} />
@@ -131,7 +131,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-pink-500 active:bg-black transition-colors text-white font-body font-semibold py-3 rounded-lg disabled:opacity-50"
+            className="w-full bg-blue-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-blue-300 transition disabled:opacity-50"
           >
             {loading ? "Registrando..." : "Registrarse"}
           </button>
@@ -141,11 +141,12 @@ const Register = () => {
             ¿Ya tenés cuenta?{" "}
             <Link
               to="/auth"
-              className="text-pink-500 font-body font-semibold"
+              className="text-pink-300 font-medium hover:underline"
             >
               Iniciá sesión
             </Link>
           </p>
+
         </form>
       </div>
     </div>

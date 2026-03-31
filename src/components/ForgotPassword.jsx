@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -21,7 +20,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/users/forgot-password`, // 👈 SIN /api/v1 acá
+        `${API_BASE_URL}/users/forgot-password`,
         { email }
       );
 
@@ -40,24 +39,26 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="bg-gray-100 px-4 pt-20 sm:pt-24 pb-12">
+    <div className="bg-gray-100 px-4 pt-20 sm:pt-24 pb-12 min-h-screen text-gray-700 font-medium">
       <div className="mx-auto w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-semibold text-center mb-4">
+
+        <h2 className="text-2xl font-medium text-center mb-4">
           Recuperar contraseña
         </h2>
 
-        <p className="text-sm text-gray-600 mb-6 text-center">
+        <p className="text-sm text-gray-500 mb-6 text-center">
           Ingresá tu email y te enviaremos un enlace para restablecer tu contraseña.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
           <div>
-            <label className="block font-body font-semibold mb-1">
+            <label className="block font-medium mb-1">
               Email
             </label>
             <input
               type="email"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-200"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -67,21 +68,23 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-pink-500 active:bg-black transition-colors text-white font-body font-semibold py-3 rounded-lg disabled:opacity-50"
+            className="w-full bg-pink-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-pink-300 transition disabled:opacity-50"
           >
             {loading ? "Enviando..." : "Enviar enlace"}
           </button>
+
         </form>
 
         <p className="text-center text-sm mt-6">
           ¿Ya recordaste tu contraseña?{" "}
           <Link
             to="/auth"
-            className="text-pink-500 font-body font-semibold"
+            className="text-pink-300 font-medium hover:underline"
           >
             Iniciar sesión
           </Link>
         </p>
+
       </div>
     </div>
   );

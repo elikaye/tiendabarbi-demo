@@ -29,7 +29,7 @@ export default function SearchBar() {
       placeholder="Buscar productos..."
       value={query}
       onChange={handleChange}
-      className="border border-gray-300 rounded px-3 py-1 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-pink-500"
+      className="border border-gray-300 rounded px-3 py-1 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-pink-200"
     />
   );
 }

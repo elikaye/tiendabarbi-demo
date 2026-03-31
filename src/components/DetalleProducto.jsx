@@ -35,11 +35,9 @@ const DetalleProducto = () => {
         const res = await fetch(`${API_BASE_URL}/products/${id}`);
         if (!res.ok) throw new Error("Error cargando producto");
         const data = await res.json();
-        console.log("📦 Producto recibido de API:", data);
         setProducto(data);
         setImagenActiva(data.imageUrl);
-      } catch (err) {
-        console.error("❌ Error fetchProducto:", err);
+      } catch {
         toast.error("No se pudo cargar el producto");
       } finally {
         setLoading(false);
@@ -50,12 +48,16 @@ const DetalleProducto = () => {
 
   if (loading)
     return (
-      <div className="text-center py-16 text-gray-500">Cargando producto…</div>
+      <div className="text-center py-16 text-gray-700 font-medium">
+        Cargando producto…
+      </div>
     );
 
   if (!producto)
     return (
-      <div className="text-center py-16 text-gray-500">Producto no encontrado</div>
+      <div className="text-center py-16 text-gray-700 font-medium">
+        Producto no encontrado
+      </div>
     );
 
   const parseColores = (colores) => {
@@ -88,7 +90,7 @@ const DetalleProducto = () => {
 
   const toggleFavorito = async () => {
     if (!token) {
-      toast.info("Iniciá sesión para agregar a favoritos", { autoClose: 1500 });
+      toast.info("Iniciá sesión para agregar a favoritos");
       return;
     }
     if (loadingFav) return;
@@ -111,35 +113,39 @@ const DetalleProducto = () => {
 
   const handleAgregarAlCarrito = async () => {
     if (!token) {
-      toast.info("Iniciá sesión para poder comprar", { autoClose: 1500 });
+      toast.info("Iniciá sesión para poder comprar");
       return;
     }
+
     if (!colorSeleccionado && coloresArray.length > 0) {
-      toast.info("Por favor, seleccioná un color", { autoClose: 2000 });
+      toast.info("Seleccioná un color");
       return;
     }
+
     if (!talleSeleccionado && tallesArray.length > 0) {
-      toast.info("Por favor, seleccioná un talle", { autoClose: 2000 });
+      toast.info("Seleccioná un talle");
       return;
     }
+
     if (addingCart || producto.estado !== "activo") return;
 
     try {
       setAddingCart(true);
+
       const productoParaCarrito = {
         ...producto,
         color: colorSeleccionado || null,
         talle: talleSeleccionado || null,
       };
+
       if (isInCart) {
         await eliminarDelCarrito(producto.id);
-        toast.info(`${producto.nombre} eliminado del carrito`, { autoClose: 1500 });
+        toast.info("Producto eliminado del carrito");
       } else {
         await agregarAlCarrito(productoParaCarrito, 1);
-        toast.success(`${producto.nombre} agregado al carrito`, { autoClose: 1500 });
+        toast.success("Producto agregado al carrito");
       }
-    } catch (err) {
-      console.error("❌ Error agregando al carrito:", err);
+    } catch {
       toast.error("No se pudo actualizar el carrito");
     } finally {
       setAddingCart(false);
@@ -152,7 +158,6 @@ const DetalleProducto = () => {
       : `${CLOUDINARY_BASE_URL}${producto.imageUrl}`
     : "/placeholder.png";
 
-  // 🔹 Aquí está la corrección: usamos `producto.imagenes` para el carrusel
   const imagenesProducto = [
     producto.imageUrl,
     ...(producto.imagenes || []),
@@ -166,45 +171,37 @@ const DetalleProducto = () => {
 
         <button
           onClick={toggleFavorito}
-          disabled={loadingFav}
-          className={`absolute top-3 right-3 text-2xl md:text-3xl ${
-            isFavorito ? "text-pink-600" : "text-black hover:text-pink-600"
+          className={`absolute top-3 right-3 text-2xl ${
+            isFavorito
+              ? "text-pink-200"
+              : "text-gray-700 hover:text-pink-200"
           }`}
         >
           <FaHeart />
         </button>
 
-        <h2 className="text-xl md:text-3xl font-body mb-4 text-center">
+        <h2 className="text-xl md:text-3xl font-medium text-gray-700 mb-4 text-center">
           {producto.nombre}
         </h2>
 
         <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
 
-          {/* GALERIA */}
           <div className="flex flex-col items-center gap-3">
-
             <img
               src={imagenActiva || imgSrc}
               alt={producto.nombre}
               className="w-full max-w-[220px] md:max-w-xs h-56 md:h-80 object-contain rounded-lg"
-              onError={(e) => (e.currentTarget.src = "/placeholder.png")}
             />
 
             {imagenesProducto.length > 1 && (
-              <Swiper
-                modules={[Navigation]}
-                navigation
-                spaceBetween={10}
-                slidesPerView={4}
-                className="w-[220px] md:w-[260px]"
-              >
+              <Swiper modules={[Navigation]} navigation spaceBetween={10} slidesPerView={4}>
                 {imagenesProducto.map((img, i) => (
                   <SwiperSlide key={i}>
                     <img
                       src={img}
                       onClick={() => setImagenActiva(img)}
                       className={`h-16 w-full object-contain border rounded cursor-pointer ${
-                        imagenActiva === img ? "border-pink-500" : "border-gray-300"
+                        imagenActiva === img ? "border-pink-200" : "border-gray-300"
                       }`}
                     />
                   </SwiperSlide>
@@ -213,28 +210,20 @@ const DetalleProducto = () => {
             )}
           </div>
 
-          {/* DETALLES */}
-          <div className="flex flex-col gap-3 w-full text-center md:text-left">
+          <div className="flex flex-col gap-3 w-full text-center md:text-left text-gray-700 font-medium">
 
-            {productoInactivo && (
-              <div className="bg-red-100 text-red-700 px-4 py-2 rounded">
-                ❌ Producto sin stock
-              </div>
-            )}
+            {producto.descripcion && <p>{producto.descripcion}</p>}
 
-            {producto.descripcion && (
-              <p className="text-gray-700">{producto.descripcion}</p>
-            )}
-
+            {/* ✅ COLOR CORREGIDO */}
             {coloresArray.length > 0 && (
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold">Elegí un color:</label>
+              <div>
+                <label className="font-medium">Elegí un color:</label>
                 <select
-                  className="border rounded px-2 py-1"
                   value={colorSeleccionado}
                   onChange={(e) => setColorSeleccionado(e.target.value)}
+                  className="border rounded px-2 py-1 mt-1"
                 >
-                  <option value="">--Seleccionar--</option>
+                  <option value="">Seleccionar</option>
                   {coloresArray.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
@@ -242,15 +231,16 @@ const DetalleProducto = () => {
               </div>
             )}
 
+            {/* ✅ TALLE CORREGIDO */}
             {tallesArray.length > 0 && (
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold">Elegí un talle:</label>
+              <div>
+                <label className="font-medium">Elegí un talle:</label>
                 <select
-                  className="border rounded px-2 py-1"
                   value={talleSeleccionado}
                   onChange={(e) => setTalleSeleccionado(e.target.value)}
+                  className="border rounded px-2 py-1 mt-1"
                 >
-                  <option value="">--Seleccionar--</option>
+                  <option value="">Seleccionar</option>
                   {tallesArray.map((t) => (
                     <option key={t} value={t}>{t}</option>
                   ))}
@@ -258,15 +248,14 @@ const DetalleProducto = () => {
               </div>
             )}
 
-            <p className="text-2xl font-body text-pink-600 mt-2">
+            <p className="text-2xl font-medium text-gray-700 mt-2">
               ${new Intl.NumberFormat("es-AR").format(producto.precio)}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-2">
+            <div className="flex flex-col sm:flex-row gap-3 mt-3">
               <button
                 onClick={handleAgregarAlCarrito}
-                disabled={addingCart || productoInactivo}
-                className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-black transition flex items-center justify-center gap-2"
+                className="bg-pink-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-pink-300 transition flex items-center justify-center gap-2"
               >
                 <FaShoppingBag />
                 {isInCart ? "Quitar del carrito" : "Agregar al carrito"}
@@ -274,17 +263,11 @@ const DetalleProducto = () => {
 
               <button
                 onClick={() => navigate("/")}
-                className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-black transition"
+                className="bg-blue-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-blue-300 transition"
               >
                 Seguir comprando
               </button>
             </div>
-
-            {(coloresArray.length > 0 || tallesArray.length > 0) && (
-              <p className="text-xs italic mt-1 text-gray-500">
-                ✅ La clienta confirmará stock y disponibilidad del color/talle seleccionado.
-              </p>
-            )}
 
           </div>
         </div>

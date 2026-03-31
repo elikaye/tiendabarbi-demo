@@ -12,8 +12,8 @@ async function crearUsuarioAdmin() {
     console.log('✔ Conectado a la base de datos');
 
     const nombre = 'Nombre Cliente';
-    const email = 'barbytienda30@gmail.com';
-    const passwordPlain = 'InduBarbie#2025';
+    const email = 'elianakaye13@gmail.com';
+    const passwordPlain = '36081889eK';
     const rol = 'admin';
 
     // Busco cualquier usuario con ese email, incluyendo los eliminados (soft delete)

@@ -1,7 +1,7 @@
 import React from "react";
 import { useCart } from "./CartContext";
 
-const numeroTienda = "+5491164283906"; // número de WhatsApp de la tienda
+const numeroTienda = "+5491138175256"; // número de WhatsApp de la tienda
 
 const BotonWhatsAppCheckout = () => {
   const { carrito, total } = useCart();

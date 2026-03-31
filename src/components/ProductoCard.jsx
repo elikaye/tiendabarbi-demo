@@ -9,6 +9,7 @@ import { CLOUDINARY_BASE_URL } from "../config";
 const ProductoCard = ({ producto }) => {
   const [loaded, setLoaded] = useState(false);
   const [loadingFav, setLoadingFav] = useState(false);
+  const [hearts, setHearts] = useState([]);
 
   const { user } = useAuth();
   const { favoritos, agregarFavorito, eliminarFavorito } = useFavoritos();
@@ -17,7 +18,6 @@ const ProductoCard = ({ producto }) => {
 
   const esActivo = producto.estado === "activo";
 
-  // ✅ Favorito derivado 100% del context (SIN estado local)
   const isFavorito = Array.isArray(favoritos)
     ? favoritos.some((f) =>
         (
@@ -28,6 +28,17 @@ const ProductoCard = ({ producto }) => {
         )?.toString() === producto.id?.toString()
       )
     : false;
+
+  const lanzarCorazones = () => {
+    const nuevos = [
+      { id: Date.now(), x: -12, scale: 0.9 },
+      { id: Date.now() + 1, x: 0, scale: 1 },
+      { id: Date.now() + 2, x: 12, scale: 1.1 }
+    ];
+
+    setHearts(nuevos);
+    setTimeout(() => setHearts([]), 500); // 🔥 más rápido
+  };
 
   const toggleFavorito = async (e) => {
     e.preventDefault();
@@ -46,6 +57,7 @@ const ProductoCard = ({ producto }) => {
         await eliminarFavorito(producto.id);
       } else {
         await agregarFavorito(producto);
+        lanzarCorazones();
       }
     } catch {
       toast.error("No se pudo actualizar favoritos");
@@ -66,38 +78,59 @@ const ProductoCard = ({ producto }) => {
 
   return (
     <Link
-      to={`/producto/${producto.id}`} // 🔹 Aquí redirige a detalle de producto
+      to={`/producto/${producto.id}`}
       className="
-        relative bg-white text-black rounded-xl
+        relative bg-white rounded-xl
         shadow-md hover:shadow-lg
-        transition-shadow duration-300
-        p-3
-        flex flex-col justify-between
-        w-full
+        transition-all duration-300
+        p-3 flex flex-col
       "
     >
-      {/* ❤️ FAVORITO */}
+      {/* ❤️ BOTÓN FAVORITO */}
       <button
         onClick={toggleFavorito}
         className={`absolute top-3 right-3 z-20 ${
-          isFavorito ? "text-pink-600" : "text-black hover:text-pink-600"
+          isFavorito
+            ? "text-pink-200"
+            : "text-gray-700 hover:text-pink-200"
         }`}
       >
-        <FaHeart size={20} />
+        <FaHeart size={18} />
       </button>
 
-      <img
-        src={imgSrc}
-        alt={producto.nombre}
-        className={`rounded-md mb-2 transition-opacity ${
-          loaded ? "opacity-100" : "opacity-0"
-        }`}
-        style={{ height: "180px", objectFit: "contain" }}
-        onLoad={() => setLoaded(true)}
-        onError={(e) => (e.currentTarget.src = "/placeholder.png")}
-      />
+      {/* ❤️ CORAZONES ANIMADOS */}
+      {hearts.map((h) => (
+        <span
+          key={h.id}
+          className="absolute right-4 text-pink-200 text-xs pointer-events-none"
+          style={{
+            top: "20px",
+            transform: `translateX(${h.x}px) scale(${h.scale})`,
+            animation: "subir 0.5s ease-out forwards"
+          }}
+        >
+          ❤️
+        </span>
+      ))}
 
-      <h3 className="font-body font-semibold text-sm sm:text-base mb-1 line-clamp-2">
+      {/* 🖼️ IMAGEN */}
+      <div className="flex justify-center items-center h-60 mb-2">
+        <img
+          src={imgSrc}
+          alt={producto.nombre}
+          className={`
+            max-h-full object-contain
+            transition-all duration-300
+            ${loaded ? "opacity-100" : "opacity-0"}
+            hover:scale-105
+          `}
+          onLoad={() => setLoaded(true)}
+          onError={(e) => (e.currentTarget.src = "/placeholder.png")}
+        />
+      </div>
+
+      {/* 📝 TEXTO */}
+      <h3 className="font-medium text-gray-700 text-sm line-clamp-2">
         {producto.nombre}
       </h3>
 
@@ -105,19 +138,27 @@ const ProductoCard = ({ producto }) => {
         {producto.descripcion}
       </p>
 
-      <p className="text-pink-600 font-semibold text-base sm:text-lg mt-1">
+      <p className="text-gray-700 font-medium text-base mt-1">
         ${precioFormateado}
       </p>
 
+      {/* 🔘 BOTÓN MEJORADO */}
       {esActivo ? (
-        <p
-          className="mt-2 px-3 py-1.5 rounded-full text-xs font-body
-          flex items-center gap-2
-          mx-auto
-          text-white bg-black hover:bg-pink-500 text-center cursor-pointer"
-        >
-          Ver producto
-        </p>
+        <div className="mt-3 flex justify-center">
+          <span
+            className="
+              px-5 py-2 text-sm
+              font-medium
+              border border-pink-200
+              text-gray-700
+              hover:bg-pink-100
+              transition-all duration-200
+              cursor-pointer
+            "
+          >
+            Ver producto
+          </span>
+        </div>
       ) : (
         <p className="mt-2 text-xs text-gray-500 italic text-center">
           Producto sin stock

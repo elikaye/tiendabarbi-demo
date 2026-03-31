@@ -1,4 +1,3 @@
-// src/pages/SearchResults.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "../context/SearchContext";
@@ -25,14 +24,12 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(true);
   const [verTodosMobile, setVerTodosMobile] = useState(false);
 
-  // 🔁 si se borra la búsqueda → volvemos al inicio
   useEffect(() => {
     if (!query || query.trim() === "") {
       navigate("/");
     }
   }, [query, navigate]);
 
-  // 🔎 Fetch productos filtrados en backend
   useEffect(() => {
     const fetchProductos = async () => {
       setLoading(true);
@@ -66,7 +63,7 @@ export default function SearchResults() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] px-4 py-10 text-center text-gray-500">
+      <div className="flex items-center justify-center min-h-[60vh] px-4 py-10 text-center text-gray-700 font-medium">
         Buscando productos…
       </div>
     );
@@ -74,13 +71,12 @@ export default function SearchResults() {
 
   if (productos.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-10 text-center text-gray-600">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-10 text-center text-gray-700 font-medium">
         <p>No se encontraron productos para “{query}”</p>
       </div>
     );
   }
 
-  // 📱 MOBILE
   const productosMobile = verTodosMobile
     ? productos
     : productos.slice(0, MAX_PRODUCTOS);
@@ -89,10 +85,14 @@ export default function SearchResults() {
   const hayMasResultados = productos.length > MAX_PRODUCTOS;
 
   return (
-    <div className="bg-pink-100 min-h-screen py-6 px-4">
-      <h2 className="text-lg font-bold mb-4">Resultados para “{query}”</h2>
+    <div className="bg-white min-h-screen py-6 px-4 text-gray !text-gray-700">
+      
+      {/* 🏷️ TITULO */}
+      <h2 className="text-lg md:text-xl font-medium mb-4 text-gray !text-gray-700">
+        Resultados para “{query}”
+      </h2>
 
-      {/* 📱 MOBILE: filas con scroll horizontal */}
+      {/* 📱 MOBILE */}
       <div className="sm:hidden space-y-4">
         {filasMobile.map((fila, index) => (
           <div
@@ -112,12 +112,19 @@ export default function SearchResults() {
           </div>
         ))}
 
-        {/* 👉 BOTÓN VER MÁS (solo mobile y solo si hace falta) */}
+        {/* 🔘 VER MÁS */}
         {!verTodosMobile && hayMasResultados && (
           <div className="text-center pt-4">
             <button
               onClick={() => setVerTodosMobile(true)}
-              className="px-6 py-2 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition"
+              className="
+                px-5 py-2 text-sm
+                font-medium
+                border border-pink-200
+                text-gray-700
+                hover:bg-pink-100
+                transition-all duration-200
+              "
             >
               Ver más resultados
             </button>
@@ -125,7 +132,7 @@ export default function SearchResults() {
         )}
       </div>
 
-      {/* 🖥 DESKTOP: grid normal */}
+      {/* 🖥 DESKTOP */}
       <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
         {productos.map((p) => (
           <ProductoCard key={p.id} producto={p} />

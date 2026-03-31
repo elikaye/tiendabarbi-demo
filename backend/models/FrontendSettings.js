@@ -1,5 +1,3 @@
-
-// models/FrontendSettings.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -11,7 +9,7 @@ const FrontendSettings = sequelize.define(
       allowNull: true,
     },
     bannerBlur: {
-      type: DataTypes.BOOLEAN, // ✅ CORREGIDO
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
@@ -24,6 +22,13 @@ const FrontendSettings = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+
+    // 🔥 NUEVO CAMPO
+    miniBanners: {
+      type: DataTypes.JSON, // 💥 CLAVE
+      allowNull: true,
+      defaultValue: [],
     },
   },
   {

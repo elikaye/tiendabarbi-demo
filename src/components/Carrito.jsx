@@ -4,8 +4,9 @@ import { useAuth } from "../context/AuthContext";
 import { FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import placeholderImg from "../assets/carrito-de-compras.png";
+import { ShoppingBag } from "lucide-react";
 
-const numeroTienda = "5491164283906";
+const numeroTienda = "5491138175256";
 
 const Carrito = () => {
   const { user } = useAuth();
@@ -29,33 +30,16 @@ const Carrito = () => {
     const productosTexto = carrito
       .map((p) => {
         const precioNum = Number(p.precio ?? p.price ?? 0);
-        const precioUnitario = precioNum.toLocaleString("es-AR");
         const subtotal = precioNum * p.cantidad;
-
-        const color =
-          p.color ??
-          p.selectedColor ??
-          p.variantColor ??
-          "";
-
-        const talle =
-          p.talle ??
-          p.selectedTalle ??
-          p.size ??
-          "";
-
-        const imagenLink =
-          p.imageUrl ??
-          p.imagen ??
-          p.image ??
-          p.img ??
-          "";
+        const color = p.color ?? p.selectedColor ?? "";
+        const talle = p.talle ?? p.selectedTalle ?? p.size ?? "";
+        const imagenLink = p.imageUrl ?? p.imagen ?? p.image ?? p.img ?? "";
 
         return `• ${p.nombre}
 
 Color: ${color || "No especificado"}
 Talle: ${talle || "No especificado"}
-Precio unitario: $${precioUnitario}
+Precio unitario: $${precioNum.toLocaleString("es-AR")}
 Cantidad: ${p.cantidad}
 Subtotal: $${subtotal.toLocaleString("es-AR")}
 ${imagenLink ? `Ver producto: ${imagenLink}` : ""}`;
@@ -71,25 +55,23 @@ Total estimado: $${total.toLocaleString("es-AR")}
 
 Quedo a la espera para confirmar stock y disponibilidad.`;
 
-    return `https://wa.me/${numeroTienda}?text=${encodeURIComponent(
-      mensaje
-    )}`;
+    return `https://wa.me/${numeroTienda}?text=${encodeURIComponent(mensaje)}`;
   }, [carrito, total]);
 
   if (!user) {
     return (
-      <div className="min-h-screen pt-12 md:pt-24 pb-20 px-4 text-center bg-gradient-to-br from-pink-100 via-white to-pink-200">
-        <h1 className="text-3xl font-body font-semibold mb-6">
+      <div className="min-h-screen pt-20 md:pt-24 pb-20 px-4 text-center bg-white">
+        <h1 className="text-3xl font-semibold mb-6 text-gray-800">
           Tu carrito
         </h1>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-700 mb-6">
           Para agregar productos necesitás iniciar sesión.
         </p>
 
         <Link
           to="/auth"
-          className="inline-block bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-black transition"
+          className="inline-block bg-pink-200 text-gray-800 font-semibold px-4 py-2 rounded-lg hover:bg-pink-300 transition active:scale-95 active:translate-y-1"
         >
           Iniciar sesión / Registrarse
         </Link>
@@ -98,19 +80,20 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
   }
 
   return (
-    <div className="min-h-screen pt-12 md:pt-24 pb-20 px-4 bg-gradient-to-br from-pink-100 via-white to-pink-200">
-      <h1 className="text-3xl font-body font-semibold text-center mb-8">
+    <div className="min-h-screen pt-20 md:pt-24 pb-20 px-4 bg-white">
+      <h1 className="text-3xl font-semibold text-gray-800 text-center mb-8">
         Tu Carrito
       </h1>
 
       {loading ? (
-        <div className="text-center">Cargando carrito...</div>
+        <div className="text-center text-gray-700">Cargando carrito...</div>
       ) : carrito.length === 0 ? (
-        <div className="text-center text-gray-600">
+        <div className="text-center text-gray-700">
           <p>No hay productos en el carrito.</p>
           <Link
             to="/"
-            className="mt-4 inline-block bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-black transition"
+            className="mt-4 inline-block text-gray-800 font-semibold px-4 py-2 rounded-lg transition active:scale-95 active:translate-y-1"
+            style={{ backgroundColor: "#a3c4f3" }}
           >
             Seguir comprando
           </Link>
@@ -131,7 +114,6 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
 
             const color =
               producto.color || producto.selectedColor || "";
-
             const talle =
               producto.talle || producto.selectedTalle || "";
 
@@ -151,30 +133,30 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
                   />
 
                   <div className="flex-1">
-                    <h2 className="font-semibold">
+                    <h2 className="font-semibold text-gray-800">
                       {producto.nombre}
                     </h2>
 
                     {color && (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-600">
                         Color: {color}
                       </p>
                     )}
 
                     {talle && (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-600">
                         Talle: {talle}
                       </p>
                     )}
 
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-600">
                       Precio unitario:{" "}
-                      <span className="text-pink-600 font-semibold">
+                      <span className="text-pink-200 font-semibold">
                         ${precioNum.toLocaleString("es-AR")}
                       </span>
                     </p>
 
-                    <p className="text-pink-600 font-semibold">
+                    <p className="text-blue-300 font-semibold">
                       Subtotal: ${subtotal.toLocaleString("es-AR")}
                     </p>
                   </div>
@@ -188,19 +170,19 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
                         : agregarAlCarrito(producto, -1)
                     }
                     disabled={syncing}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="px-3 py-1 border rounded disabled:opacity-50 transition active:scale-95 active:translate-y-1"
                   >
                     −
                   </button>
 
-                  <span className="w-8 text-center font-semibold">
+                  <span className="w-8 text-center font-semibold text-gray-800">
                     {producto.cantidad}
                   </span>
 
                   <button
                     onClick={() => agregarAlCarrito(producto, 1)}
                     disabled={syncing}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="px-3 py-1 border rounded disabled:opacity-50 transition active:scale-95 active:translate-y-1"
                   >
                     +
                   </button>
@@ -210,7 +192,7 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
                       eliminarDelCarrito(producto.uniqueKey)
                     }
                     disabled={syncing}
-                    className="text-pink-500 hover:text-black transition text-lg"
+                    className="text-pink-200 hover:text-pink-400 transition text-lg"
                   >
                     <FaTrashAlt />
                   </button>
@@ -219,7 +201,7 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
             );
           })}
 
-          <div className="text-right text-xl font-semibold text-pink-600">
+          <div className="text-right text-xl font-semibold text-gray-800">
             Total: ${total.toLocaleString("es-AR")}
           </div>
 
@@ -228,9 +210,11 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
               href={linkWhatsApp}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-pink-500 text-white text-base font-semibold px-4 py-2 rounded-full shadow hover:bg-black transition w-full max-w-xs text-center"
+              className="text-gray-800 font-semibold px-4 py-2 rounded-lg shadow transition active:scale-95 active:translate-y-1 flex items-center justify-center gap-2"
+              style={{ backgroundColor: "#f3c4d3" }}
             >
-              🛒 Finalizar compra por WhatsApp
+              <ShoppingBag className="w-5 h-5" />
+              Finalizar compra
             </a>
           </div>
 
@@ -238,14 +222,16 @@ Quedo a la espera para confirmar stock y disponibilidad.`;
             <button
               onClick={vaciarCarrito}
               disabled={syncingIds.length > 0}
-              className="bg-black text-white px-4 py-2 rounded-full hover:bg-pink-500 transition"
+              className="text-gray-800 font-semibold px-4 py-2 rounded-lg transition active:scale-95 active:translate-y-1"
+              style={{ backgroundColor: "#a3c4f3" }}
             >
               Vaciar carrito
             </button>
 
             <Link
               to="/"
-              className="bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-black transition text-center"
+              className="text-gray-800 font-semibold px-4 py-2 rounded-lg transition active:scale-95 active:translate-y-1 text-center"
+              style={{ backgroundColor: "#8fae9f" }}
             >
               Seguir comprando
             </Link>

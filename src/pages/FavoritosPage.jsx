@@ -1,5 +1,4 @@
-
-// src/pages/FavoritosPage.jsx
+ //src/pages/FavoritosPage.jsx//
 import React, { useEffect } from "react";
 import { useFavoritos } from "../context/FavoritosContext";
 import ProductoCard from "../components/ProductoCard";

@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from "../config";
 import 'swiper/css';
 
-function Destacados() {
+function Destacados({ titulo = "Destacados" }) {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +16,7 @@ function Destacados() {
     const fetchProductos = async () => {
       try {
         const response = await fetch(
-          "https://tiendamoda-production-280c.up.railway.app/api/v1/products?destacados=true&limit=6"
+          `${API_BASE_URL}/products?destacados=true&limit=6`
         );
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         const data = await response.json();
@@ -32,18 +33,11 @@ function Destacados() {
   }, []);
 
   const renderSkeletons = () =>
-    Array(6)
+    Array(3)
       .fill(0)
       .map((_, i) => (
         <SwiperSlide key={`skeleton-${i}`}>
-          <div className="bg-white rounded-2xl shadow-md animate-pulse h-72 sm:h-96 flex flex-col p-5">
-            <div className="h-40 sm:h-60 bg-gray-200 rounded-2xl mb-4"></div>
-            <div className="flex flex-col flex-grow justify-between">
-              <div className="h-6 bg-gray-300 rounded mb-2 w-3/4"></div>
-              <div className="h-6 bg-gray-300 rounded w-1/2"></div>
-              <div className="mt-4 h-10 bg-gray-300 rounded w-full"></div>
-            </div>
-          </div>
+          <div className="h-[320px] sm:h-[420px] bg-gray-200 animate-pulse rounded-xl"></div>
         </SwiperSlide>
       ));
 
@@ -52,11 +46,18 @@ function Destacados() {
     return <p className="text-center py-10">No hay productos destacados disponibles.</p>;
 
   return (
-    <section className="bg-pink-100 py-16">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-2xl font-bold text-black mb-10 text-center tracking-wide">
-          Productos Destacados
-        </h2>
+    <section className="bg-[#f9f9f9] py-16">
+      <div className="max-w-7xl mx-auto px-4">
+
+        <div className="flex items-center justify-center gap-2 mb-10">
+
+      <span className="text-xl">🐻</span>
+
+      <h2 className="text-2xl md:text-3xl font-medium text-[#3a3a3a] tracking-wide">
+       {titulo}
+       </h2>
+
+      </div>
 
         <Swiper
           modules={[Autoplay]}
@@ -64,64 +65,48 @@ function Destacados() {
           onSwiper={(swiper) => (swiperRef.current = swiper)}
           autoplay={{ delay: 4000, disableOnInteraction: false }}
           loop={productos.length > 1}
-          spaceBetween={20}
+          spaceBetween={16}
           slidesPerView={1.1}
           breakpoints={{
             640: { slidesPerView: 1.3 },
             768: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            1024: { slidesPerView: 2.5 },
           }}
         >
           {loading
             ? renderSkeletons()
             : productos.map((prod, idx) => {
-                const precioFormateado = Number(prod.precio || 0).toLocaleString('es-AR');
                 const isActive = idx === activeIndex;
 
                 return (
                   <SwiperSlide key={prod.id}>
                     <Link to={`/producto/${prod.id}`}>
                       <div
-                        className={`bg-white rounded-2xl shadow-md transition-all duration-500 overflow-hidden h-full flex flex-col transform
-                          ${isActive ? 'scale-105' : 'scale-95 opacity-70'}`}
+                        className={`
+                          relative overflow-hidden rounded-xl
+                          h-[320px] sm:h-[420px]
+                          cursor-pointer group transition-all duration-500
+                          ${isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-70'}
+                        `}
                       >
-                        <div className="h-40 sm:h-60 flex items-center justify-center overflow-hidden rounded-2xl">
-                          <img
-                            src={prod.imageUrl || '/placeholder.png'}
-                            alt={prod.nombre}
-                            className="object-contain w-full h-full p-6 transition-transform duration-500"
-                            loading="lazy"
-                            onError={(e) => (e.currentTarget.src = '/placeholder.png')}
-                          />
-                        </div>
-                        <div className="p-4 sm:p-5 flex-grow flex flex-col justify-between">
-                          <h3 className="text-base sm:text-lg font-body font-semibold text-black mb-2 line-clamp-2">
-                            {prod.nombre}
-                          </h3>
-                          <div className="flex justify-between items-center mt-auto">
-                            <p className="text-pink-600 text-lg sm:text-xl font-body font-semibold">
-                              ${precioFormateado}
-                            </p>
-                            {prod.estado === "activo" ? (
-                              <p
-                                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm sm:text-sm font-body font-semibold shadow-lg transition
-                                  bg-black text-white hover:bg-pink-600 text-center cursor-pointer"
-                              >
-                                Ver producto
-                              </p>
-                            ) : (
-                              <span className="text-gray-400 italic text-sm">
-                                Disponible próximamente
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                        {/* IMAGEN */}
+                        <img
+                          src={prod.imageUrl || '/placeholder.png'}
+                          alt={prod.nombre}
+                          className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                          loading="lazy"
+                          onError={(e) => (e.currentTarget.src = '/placeholder.png')}
+                        />
+
+                        {/* OVERLAY */}
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition" />
                       </div>
                     </Link>
                   </SwiperSlide>
                 );
               })}
         </Swiper>
+
       </div>
     </section>
   );

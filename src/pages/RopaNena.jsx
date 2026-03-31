@@ -6,13 +6,17 @@ import { useLocation } from "react-router-dom";
 let io = null;
 try { io = require("socket.io-client"); } catch(e){ io = null; }
 
+/* NORMALIZAR CATEGORÍA */
 function normalizarCategoria(catRaw){
   if(!catRaw) return "otros";
   const cat = catRaw.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  if(cat.includes("zapa") || cat.includes("calza") || cat.includes("bot") || cat.includes("calzado")) return "calzado";
+
+  if(cat.includes("nena") || cat.includes("ropa-nena")) return "ropa-nena";
+
   return "otros";
 }
 
+/* NORMALIZAR TEXTO */
 function normalizarTexto(txt){
   if(!txt) return "";
   return txt
@@ -22,17 +26,17 @@ function normalizarTexto(txt){
     .trim();
 }
 
-/* NUEVA NORMALIZACIÓN DE SUBCATEGORÍAS DE CALZADO */
-
-function normalizarSubcategoriaCalzado(subRaw){
+/* 🔥 SUBCATEGORÍAS ROPA NENA */
+function normalizarSubcategoriaRopaNena(subRaw){
 
   const sub = normalizarTexto(subRaw);
 
-  if(sub.includes("borce")) return "borcegos";
-  if(sub.includes("adult")) return "zapatillas de adultos";
-  if(sub.includes("niñ") || sub.includes("nin")) return "zapatillas de niños";
-  if(sub.includes("ojota") || sub.includes("pantuf")) return "ojotas y pantuflas";
-  if(sub.includes("sandal")) return "sandalias";
+  if(sub.includes("remera") || sub.includes("camiseta")) return "remeras y camisetas";
+  if(sub.includes("pantalon") || sub.includes("jean")) return "pantalones";
+  if(sub.includes("campera") || sub.includes("buzo")) return "camperas y buzos";
+  if(sub.includes("short") || sub.includes("pollera")) return "shorts y polleras";
+  if(sub.includes("conjunto")) return "conjuntos";
+  if(sub.includes("vestido")) return "vestidos";
 
   return "otros";
 }
@@ -45,7 +49,7 @@ const chunkArray = (arr, chunkSize) => {
   return result;
 };
 
-export default function Calzado(){
+export default function RopaNena(){
 
   const [productos,setProductos] = useState([]);
   const [loading,setLoading] = useState(true);
@@ -75,7 +79,6 @@ export default function Calzado(){
     const categorias=Object.keys(grupos);
 
     while(restos){
-
       restos=false;
 
       const orden=[...categorias].sort(()=>Math.random()-0.5);
@@ -111,7 +114,7 @@ export default function Calzado(){
 
         categoria: normalizarCategoria(p.categoria),
 
-        subcategoria: normalizarSubcategoriaCalzado(p.subcategoria),
+        subcategoria: normalizarSubcategoriaRopaNena(p.subcategoria),
 
         precio: parseFloat(p.precio)||0,
 
@@ -123,7 +126,7 @@ export default function Calzado(){
 
       rawRef.current = prods.filter(p => {
 
-        if(p.categoria !== "calzado") return false;
+        if(p.categoria !== "ropa-nena") return false;
 
         if(subcategoriaQuery && normalizarTexto(p.subcategoria) !== subcategoriaQuery)
           return false;
@@ -140,7 +143,7 @@ export default function Calzado(){
 
       console.error(err);
 
-      setError("No se pudieron cargar los productos de calzado.");
+      setError("No se pudieron cargar los productos de ropa de nena.");
 
       setProductos([]);
 
@@ -158,23 +161,15 @@ export default function Calzado(){
     let socketClient=null;
 
     try{
-
       if(io){
-
         socketClient=io.connect(window.location.origin);
-
         socketRef.current=socketClient;
-
         socketClient.on("productos:changed",fetchProductos);
-
       }
-
     }catch{}
 
     return ()=>{
-
       if(socketRef.current) socketRef.current.disconnect();
-
     };
 
   },[subcategoriaQuery]);
@@ -183,14 +178,14 @@ export default function Calzado(){
 
   return (
 
-    <section className="min-h-screen py-20 px-6 bg-gradient-to-br from-pink-100 via-white to-pink-200 font-body">
+    <section className="min-h-screen py-20 px-6 bg-gradient-to-br from-white font-medium">
 
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-10 text-center">
 
           <h1 className="text-3xl font-bold text-gray-800">
-            {tituloSubcategoria ? tituloSubcategoria : "Calzados"}
+            {tituloSubcategoria ? tituloSubcategoria : "Ropa de Nena"}
           </h1>
 
         </div>
@@ -198,11 +193,9 @@ export default function Calzado(){
         {loading ? (
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-
             {Array(COLUMNAS_MOBILE*2).fill(0).map((_,i)=>
               <div key={i} className="bg-gray-200 rounded-xl h-64 animate-pulse"></div>
             )}
-
           </div>
 
         ) : error ? (
@@ -214,41 +207,27 @@ export default function Calzado(){
           <>
 
             {/* MOBILE */}
-
             <div className="sm:hidden space-y-4">
-
               {chunkArray(productos, COLUMNAS_MOBILE).map((filaProductos,index)=>(
-
                 <div
                   key={index}
                   className="flex space-x-4 overflow-x-auto pb-2"
                   style={{ scrollSnapType: "x mandatory" }}
                 >
-
                   {filaProductos.map(p=>(
-
                     <div key={p.id} className="flex-shrink-0 w-64" style={{ scrollSnapAlign: "start" }}>
-
                       <ProductoCard producto={p}/>
-
                     </div>
-
                   ))}
-
                 </div>
-
               ))}
-
             </div>
 
             {/* DESKTOP */}
-
             <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-
               {productos.map(p=>
                 <ProductoCard key={p.id} producto={p}/>
               )}
-
             </div>
 
           </>

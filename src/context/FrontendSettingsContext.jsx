@@ -9,6 +9,7 @@ export const FrontendSettingsProvider = ({ children }) => {
     bannerBlur: false,
     cintaTexto: "",
     cintaVisible: true,
+    miniBanners: [], // 🔥 NUEVO
   });
 
   const [loading, setLoading] = useState(true);
@@ -27,6 +28,7 @@ export const FrontendSettingsProvider = ({ children }) => {
             bannerBlur: Number(res.data.bannerBlur) === 1,
             cintaTexto: res.data.cintaTexto || "",
             cintaVisible: Number(res.data.cintaVisible) === 1,
+            miniBanners: res.data.miniBanners || [], // 🔥 NUEVO
           };
 
           setSettings(sanitized);
@@ -53,6 +55,7 @@ export const FrontendSettingsProvider = ({ children }) => {
         bannerBlur: Number(res.data.bannerBlur) === 1,
         cintaTexto: res.data.cintaTexto || "",
         cintaVisible: Number(res.data.cintaVisible) === 1,
+        miniBanners: res.data.miniBanners || [], // 🔥 NUEVO
       };
 
       setSettings(sanitized);
