@@ -17,9 +17,8 @@ const app = express();
 // 🌐 Orígenes permitidos
 const allowedOrigins = [
   'http://localhost:5173',
-
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
-].filter(Boolean);
+  'https://tiendainfantil.vercel.app',
+];
 
 // ✅ CORS seguro
 app.use(
