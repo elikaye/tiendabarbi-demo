@@ -55,8 +55,8 @@ const PORT = process.env.PORT || 5000;
     await sequelize.authenticate();
     console.log('✅ Conectado a MySQL con Sequelize');
 
-    await sequelize.sync();
-    console.log('✅ Tablas sincronizadas');
+   // await sequelize.sync();
+    //console.log('✅ Tablas sincronizadas');
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
