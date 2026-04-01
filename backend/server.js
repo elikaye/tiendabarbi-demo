@@ -17,12 +17,10 @@ const app = express();
 // ✅ CORS abierto (FIX)
 app.use(
   cors({
-    origin: true,
+    origin: 'https://tiendainfantil.vercel.app',
     credentials: true,
   })
 );
-
-app.options('*', cors());
 app.use(express.json());
 
 // 📦 Rutas
