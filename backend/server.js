@@ -14,26 +14,11 @@ import frontendSettingsRoutes from './routes/frontendSettingsRoutes.js';
 dotenv.config();
 const app = express();
 
-// 🌐 Orígenes permitidos
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://tiendainfantil.vercel.app',
-];
-
-// ✅ CORS seguro
+// ✅ CORS abierto (FIX)
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn('🚫 Bloqueado por CORS:', origin);
-        callback(new Error('No permitido por CORS'));
-      }
-    },
+    origin: true,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
@@ -72,7 +57,6 @@ const PORT = process.env.PORT || 5000;
     await sequelize.authenticate();
     console.log('✅ Conectado a MySQL con Sequelize');
 
-    // 🚫 IMPORTANTE: SIN alter ni force en producción
     await sequelize.sync();
     console.log('✅ Tablas sincronizadas');
 
