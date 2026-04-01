@@ -9,7 +9,10 @@ console.log("📨 SENDGRID_API_KEY existe?", !!process.env.SENDGRID_API_KEY);
 console.log("📨 EMAIL_FROM:", process.env.EMAIL_FROM);
 console.log("🌐 FRONTEND_URL:", process.env.FRONTEND_URL);
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// ✅ Solo configurar si existe la API KEY
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 /* ==================== LOGIN ==================== */
 export const loginUsuario = async (req, res) => {
@@ -83,7 +86,6 @@ export const forgotPassword = async (req, res) => {
     const usuario = await User.findOne({ where: { email } });
 
     if (!usuario) {
-      console.log("⚠️ Usuario no encontrado, pero respondemos success por seguridad");
       return res.json({
         success: true,
         message: 'Si el email existe, te enviaremos instrucciones'
@@ -93,8 +95,6 @@ export const forgotPassword = async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExp = Date.now() + 1000 * 60 * 30;
 
-    console.log("🪙 Token generado:", resetToken);
-
     usuario.resetToken = resetToken;
     usuario.resetTokenExp = resetTokenExp;
     await usuario.save();
@@ -102,22 +102,25 @@ export const forgotPassword = async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     console.log("🔗 URL de reset:", resetUrl);
-    console.log("📤 Enviando email a:", usuario.email);
 
-    await sgMail.send({
-      to: usuario.email,
-      from: process.env.EMAIL_FROM, // debe estar verificado en SendGrid
-      subject: 'Recuperación de contraseña',
-      html: `
-        <p>Hola ${usuario.nombre},</p>
-        <p>Hacé clic para restablecer tu contraseña:</p>
-        <a href="${resetUrl}">${resetUrl}</a>
-        <p>Este enlace expira en 30 minutos.</p>
-        <p>Si no ves el email, revisá tu bandeja de entrada o la carpeta de spam.</p>
-      `,
-    });
+    // ✅ SOLO envía email si SendGrid está configurado
+    if (process.env.SENDGRID_API_KEY) {
+      await sgMail.send({
+        to: usuario.email,
+        from: process.env.EMAIL_FROM,
+        subject: 'Recuperación de contraseña',
+        html: `
+          <p>Hola ${usuario.nombre},</p>
+          <p>Hacé clic para restablecer tu contraseña:</p>
+          <a href="${resetUrl}">${resetUrl}</a>
+          <p>Este enlace expira en 30 minutos.</p>
+        `,
+      });
 
-    console.log("✅ Email enviado correctamente");
+      console.log("✅ Email enviado");
+    } else {
+      console.log("📭 SendGrid desactivado (modo demo)");
+    }
 
     res.json({
       success: true,
@@ -125,7 +128,7 @@ export const forgotPassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ forgotPassword ERROR COMPLETO:', error);
+    console.error('❌ forgotPassword:', error);
     res.status(500).json({ success: false });
   }
 };
@@ -136,8 +139,6 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    console.log("🔐 Reset password con token:", token);
-
     const usuario = await User.scope('withPassword').findOne({
       where: {
         resetToken: token,
@@ -146,7 +147,6 @@ export const resetPassword = async (req, res) => {
     });
 
     if (!usuario) {
-      console.log("❌ Token inválido o expirado");
       return res.status(400).json({
         success: false,
         message: 'Token inválido o expirado'
@@ -158,8 +158,6 @@ export const resetPassword = async (req, res) => {
     usuario.resetTokenExp = null;
 
     await usuario.save();
-
-    console.log("✅ Contraseña actualizada para:", usuario.email);
 
     res.json({
       success: true,
