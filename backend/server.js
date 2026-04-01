@@ -14,14 +14,20 @@ import frontendSettingsRoutes from './routes/frontendSettingsRoutes.js';
 dotenv.config();
 const app = express();
 
-// ✅ CORS abierto (FIX)
+// ✅ CORS
 app.use(
   cors({
     origin: 'https://tiendainfantil.vercel.app',
     credentials: true,
   })
 );
+
 app.use(express.json());
+
+// 🧠 Ruta test
+app.get('/', (req, res) => {
+  res.send('✅ API funcionando 🚀');
+});
 
 // 📦 Rutas
 app.use('/api/v1/users', userRoutes);
@@ -31,11 +37,6 @@ app.use('/api/v1/ordenes', orderRoutes);
 app.use('/api/v1/favoritos', favoritoRoutes);
 app.use('/api/v1/frontend-settings', frontendSettingsRoutes);
 
-// 🧠 Ruta test
-app.get('/', (req, res) => {
-  res.send('✅ API funcionando 🚀');
-});
-
 // 🚧 404
 app.use((req, res) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
@@ -43,11 +44,12 @@ app.use((req, res) => {
 
 // ⚠️ Error global
 app.use((err, req, res, next) => {
-  console.error('🔴 Error global:', err.message);
+  console.error('🔴 Error global:', err);
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
-const PORT = process.env.PORT || 5000;
+// ✅ IMPORTANTE: usar puerto de Railway
+const PORT = process.env.PORT || 8080;
 
 // 🔗 Conexión DB y arranque
 (async () => {
@@ -55,10 +57,7 @@ const PORT = process.env.PORT || 5000;
     await sequelize.authenticate();
     console.log('✅ Conectado a MySQL con Sequelize');
 
-   // await sequelize.sync();
-    //console.log('✅ Tablas sincronizadas');
-
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
     });
   } catch (error) {
