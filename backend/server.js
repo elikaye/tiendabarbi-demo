@@ -10,6 +10,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import favoritoRoutes from './routes/favoritoRoutes.js';
 import frontendSettingsRoutes from './routes/frontendSettingsRoutes.js';
+import { CloudSnow } from 'lucide-react';
 
 dotenv.config();
 const app = express();
@@ -54,7 +55,13 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ PUERTO SOLO DE RAILWAY (CLAVE)
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
+  console.log('🔌 FRONTEND_URL:', process.env.FRONTEND_URL);
+});
 
 if (!PORT) {
   console.error('❌ PORT no definido');
