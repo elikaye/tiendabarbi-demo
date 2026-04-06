@@ -10,7 +10,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import favoritoRoutes from './routes/favoritoRoutes.js';
 import frontendSettingsRoutes from './routes/frontendSettingsRoutes.js';
-import { CloudSnow } from 'lucide-react';
+
 
 dotenv.config();
 const app = express();
