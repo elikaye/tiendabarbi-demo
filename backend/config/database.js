@@ -1,31 +1,35 @@
-
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Detecta si estamos en producción
+console.log("👉 NODE_ENV:", process.env.NODE_ENV);
+console.log("👉 DATABASE_URL:", process.env.DATABASE_URL);
+console.log("👉 DB_HOST:", process.env.DB_HOST);
+
 const isProd = process.env.NODE_ENV === "production";
 
-// Configuración de Sequelize
-const sequelize = isProd
-  ? new Sequelize(process.env.DATABASE_URL, {
+let sequelize;
+
+if (isProd) {
+  console.log("🟣 USANDO DATABASE_URL");
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: "mysql",
+    logging: false,
+  });
+} else {
+  console.log("🟢 USANDO DB_HOST");
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
       dialect: "mysql",
-      logging: false, // Desactiva logs en producción
-    })
-  : new Sequelize(
-      process.env.DB_NAME,      // database
-      process.env.DB_USER,      // root
-      process.env.DB_PASSWORD,  // contraseña del proxy
-      {
-        host: process.env.DB_HOST, // tramway.proxy.rlwy.net
-        port: process.env.DB_PORT, // 53155
-        dialect: "mysql",
-        logging: console.log,      // Logs en desarrollo
-        dialectOptions: {
-          connectTimeout: 10000,   // Evita ETIMEDOUT
-        },
-      }
-    );
+      logging: console.log,
+    }
+  );
+}
 
 export default sequelize;
