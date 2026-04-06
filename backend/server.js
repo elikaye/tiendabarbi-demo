@@ -23,7 +23,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function(origin, callback) {
-      // Si no hay origen (ej: Postman) o está permitido
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -41,7 +40,7 @@ app.get('/', (req, res) => {
   res.send('✅ API funcionando 🚀');
 });
 
-// ❤️ Healthcheck (importante para Railway)
+// ❤️ Healthcheck
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
