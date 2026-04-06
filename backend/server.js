@@ -29,6 +29,11 @@ app.get('/', (req, res) => {
   res.send('✅ API funcionando 🚀');
 });
 
+// ❤️ Healthcheck (importante para Railway)
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // 📦 Rutas
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products', productRoutes);
@@ -48,17 +53,22 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
-// ✅ Puerto dinámico (Railway)
-const PORT = process.env.PORT || 5000;
+// ✅ PUERTO SOLO DE RAILWAY (CLAVE)
+const PORT = process.env.PORT;
 
-// 🚀 ARRANCAR SERVER PRIMERO (CLAVE)
+if (!PORT) {
+  console.error('❌ PORT no definido');
+  process.exit(1);
+}
+
+// 🚀 Levantar servidor PRIMERO
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
   console.log('🔌 FRONTEND_URL:', process.env.FRONTEND_URL);
 });
 
-// 🔗 Conectar DB SIN BLOQUEAR EL SERVER
+// 🔗 Conectar DB SIN BLOQUEAR
 (async () => {
   try {
     await sequelize.authenticate();
