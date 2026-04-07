@@ -43,7 +43,7 @@ const loadProduct = async (req,res,next)=>{
 router.get('/', async (req,res)=>{
   try{
 
-    const {page,limit,search,categoria,destacados} = req.query;
+    const { page, limit, search, categoria, destacados } = req.query;
 
     const whereClause = {};
 
@@ -51,16 +51,13 @@ router.get('/', async (req,res)=>{
 
     if(destacados === "true") whereClause.destacados = true;
 
-    if(search){
-
-      const searchLower = `%${search.toLowerCase()}%`;
-
+    // ✅ FIX: sin LOWER ni sequelize.fn (rompía en producción)
+    if (search) {
       whereClause[Op.or] = [
-        sequelize.where(sequelize.fn('LOWER', sequelize.col('nombre')), {[Op.like]:searchLower}),
-        sequelize.where(sequelize.fn('LOWER', sequelize.col('descripcion')), {[Op.like]:searchLower}),
-        sequelize.where(sequelize.fn('LOWER', sequelize.col('categoria')), {[Op.like]:searchLower})
+        { nombre: { [Op.like]: `%${search}%` } },
+        { descripcion: { [Op.like]: `%${search}%` } },
+        { categoria: { [Op.like]: `%${search}%` } }
       ];
-
     }
 
     const queryOptions = {
@@ -68,17 +65,21 @@ router.get('/', async (req,res)=>{
       order: [['createdAt','DESC']]
     };
 
-    if(page && limit){
+    // ✅ FIX: parseo seguro
+    const parsedLimit = limit ? parseInt(limit) : null;
+    const parsedPage = page ? parseInt(page) : null;
 
-      queryOptions.limit = parseInt(limit);
-      queryOptions.offset = (parseInt(page)-1)*parseInt(limit);
+    if(parsedPage && parsedLimit){
+
+      queryOptions.limit = parsedLimit;
+      queryOptions.offset = (parsedPage - 1) * parsedLimit;
 
       const result = await Product.findAndCountAll(queryOptions);
 
       return res.json({
         products: result.rows,
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(result.count / parseInt(limit)),
+        currentPage: parsedPage,
+        totalPages: Math.ceil(result.count / parsedLimit),
         totalProducts: result.count
       });
 
@@ -93,7 +94,7 @@ router.get('/', async (req,res)=>{
 
   }catch(error){
 
-    console.error("🔥 Error obteniendo productos:",error);
+    console.error("🔥 Error obteniendo productos:", error);
 
     res.status(500).json({message:'Error al obtener productos'});
 
