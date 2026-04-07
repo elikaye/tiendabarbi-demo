@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 
 // -----------------------------
-// ✅ CORS BIEN CONFIGURADO (DEV + PROD)
+// ✅ CORS (DEV + PROD)
 // -----------------------------
 const allowedOrigins = [
   'http://localhost:5173',
@@ -25,20 +25,19 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // Postman / server-to-server
+      if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
         console.log('⛔ CORS bloqueado para:', origin);
-        return callback(null, false); // IMPORTANTE: no tirar error
+        return callback(null, false);
       }
     },
     credentials: true,
   })
 );
 
-// ⚠️ Manejo manual de preflight (CLAVE para evitar 502)
 app.options('*', cors());
 
 // -----------------------------
@@ -76,24 +75,23 @@ app.use((err, req, res, next) => {
 });
 
 // -----------------------------
-// Puerto dinámico (CRÍTICO)
+// 🚀 ARRANQUE CORRECTO (FIX 502)
 // -----------------------------
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-  console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
-  console.log('🔌 FRONTEND_URL:', process.env.FRONTEND_URL);
-});
-
-// -----------------------------
-// DB conexión
-// -----------------------------
 (async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Conectado a MySQL con Sequelize');
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+      console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
+      console.log('🔌 FRONTEND_URL:', process.env.FRONTEND_URL);
+    });
+
   } catch (error) {
     console.error('❌ Error DB:', error.message);
+    process.exit(1);
   }
 })();
