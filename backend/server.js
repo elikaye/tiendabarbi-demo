@@ -80,7 +80,7 @@ app.use((err, req, res, next) => {
 // -----------------------------
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
   console.log('🔌 FRONTEND_URL:', process.env.FRONTEND_URL);
