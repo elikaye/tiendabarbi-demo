@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { sequelize } from './models/index.js';
 
-// 📦 Importar rutas
+// 📦 Rutas
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
@@ -15,24 +15,16 @@ dotenv.config();
 const app = express();
 
 // -----------------------------
-// CORS seguro
+// ✅ CORS SIMPLE (FIX DEFINITIVO)
 // -----------------------------
-if (process.env.NODE_ENV === 'development') {
-  // Solo habilitar CORS para localhost en dev
-  app.use(cors({
-    origin: 'http://localhost:5173',
+app.use(
+  cors({
+    origin: true,
     credentials: true,
-  }));
-  console.log('⚙️ CORS habilitado para desarrollo local');
-} else {
-  // En producción se deja abierto al dominio real
-  app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-  }));
-  console.log('⚙️ CORS habilitado para producción:', process.env.FRONTEND_URL);
-}
+  })
+);
 
+// -----------------------------
 app.use(express.json());
 
 // -----------------------------
@@ -42,7 +34,7 @@ app.get('/', (req, res) => res.send('✅ API funcionando 🚀'));
 app.get('/health', (req, res) => res.status(200).send('OK'));
 
 // -----------------------------
-// Rutas de la API
+// Rutas API
 // -----------------------------
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products', productRoutes);
@@ -62,14 +54,15 @@ app.use((req, res) => {
 // Error global
 // -----------------------------
 app.use((err, req, res, next) => {
-  console.error('🔴 Error global:', err.message || err);
+  console.error('🔴 Error global:', err);
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
 // -----------------------------
-// Puerto dinámico
+// Puerto (Railway usa PORT automáticamente)
 // -----------------------------
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
@@ -77,13 +70,13 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 // -----------------------------
-// Conectar DB sin bloquear server
+// DB conexión (no bloquea server)
 // -----------------------------
 (async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Conectado a MySQL con Sequelize');
   } catch (error) {
-    console.error('❌ Error al conectar con Sequelize:', error.message);
+    console.error('❌ Error DB:', error.message);
   }
 })();
