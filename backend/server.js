@@ -15,20 +15,37 @@ dotenv.config();
 const app = express();
 
 // -----------------------------
-// ✅ CORS SIMPLE (FIX DEFINITIVO)
+// ✅ CORS BIEN CONFIGURADO (DEV + PROD)
 // -----------------------------
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+];
+
 app.use(
   cors({
-    origin: true,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // Postman / server-to-server
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.log('⛔ CORS bloqueado para:', origin);
+        return callback(null, false); // IMPORTANTE: no tirar error
+      }
+    },
     credentials: true,
   })
 );
+
+// ⚠️ Manejo manual de preflight (CLAVE para evitar 502)
+app.options('*', cors());
 
 // -----------------------------
 app.use(express.json());
 
 // -----------------------------
-// Healthcheck y test
+// Healthcheck
 // -----------------------------
 app.get('/', (req, res) => res.send('✅ API funcionando 🚀'));
 app.get('/health', (req, res) => res.status(200).send('OK'));
@@ -59,9 +76,9 @@ app.use((err, req, res, next) => {
 });
 
 // -----------------------------
-// Puerto (Railway usa PORT automáticamente)
+// Puerto dinámico (CRÍTICO)
 // -----------------------------
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
@@ -70,7 +87,7 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 // -----------------------------
-// DB conexión (no bloquea server)
+// DB conexión
 // -----------------------------
 (async () => {
   try {
