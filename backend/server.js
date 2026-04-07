@@ -15,11 +15,11 @@ dotenv.config();
 const app = express();
 
 // -----------------------------
-// ✅ CORS (DEV + PROD)
+// ✅ CORS DEFINITIVO
 // -----------------------------
 const allowedOrigins = [
   'http://localhost:5173',
-  process.env.FRONTEND_URL,
+  'https://tiendainfantil.vercel.app',
 ];
 
 app.use(
@@ -29,16 +29,20 @@ app.use(
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
-      } else {
-        console.log('⛔ CORS bloqueado para:', origin);
-        return callback(null, false);
       }
+
+      console.log('⛔ CORS bloqueado para:', origin);
+      return callback(new Error('CORS no permitido'));
     },
     credentials: true,
   })
 );
 
-app.options('*', cors());
+// ✅ Preflight FIX
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 
 // -----------------------------
 app.use(express.json());
@@ -70,12 +74,12 @@ app.use((req, res) => {
 // Error global
 // -----------------------------
 app.use((err, req, res, next) => {
-  console.error('🔴 Error global:', err);
+  console.error('🔴 Error global:', err.message);
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
 // -----------------------------
-// 🚀 ARRANQUE CORRECTO (FIX 502)
+// 🚀 ARRANQUE CORRECTO (Railway)
 // -----------------------------
 const PORT = process.env.PORT || 5000;
 
