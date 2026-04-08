@@ -1,5 +1,5 @@
 import express from 'express';
-import { Product, sequelize } from '../models/index.js';
+import { Product } from '../models/index.js';
 import { body, validationResult } from 'express-validator';
 import { authenticate } from '../middleware/authMiddleware.js';
 import multer from 'multer';
@@ -10,48 +10,47 @@ const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
 /* ---------------- VALIDACIONES ---------------- */
-
 const validateProduct = [
   body('nombre').trim().isLength({ min: 2 }).withMessage('Nombre inválido'),
   body('precio').isFloat({ gt: 0 }).withMessage('El precio debe ser mayor a 0'),
   body('categoria').trim().isLength({ min: 2 }).withMessage('Categoría inválida'),
-  body('estado').optional().isIn(['activo','inactivo','agotado']).withMessage('Estado inválido'),
-  body('destacados').optional().isBoolean().withMessage('Destacados debe ser booleano'),
-  (req,res,next)=>{
+  body('estado')
+    .optional()
+    .isIn(['activo', 'inactivo', 'agotado'])
+    .withMessage('Estado inválido'),
+  body('destacados')
+    .optional()
+    .isBoolean()
+    .withMessage('Destacados debe ser booleano'),
+  (req, res, next) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) return res.status(400).json({errors:errors.array()});
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     next();
   }
 ];
 
 /* ---------------- CARGAR PRODUCTO ---------------- */
-
-const loadProduct = async (req,res,next)=>{
-  try{
+const loadProduct = async (req, res, next) => {
+  try {
     const product = await Product.findByPk(req.params.id);
-    if(!product) return res.status(404).json({message:'Producto no encontrado'});
+    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
     req.product = product;
     next();
-  }catch(error){
-    console.error("❌ Error buscando producto:",error);
-    res.status(500).json({message:'Error interno'});
+  } catch (error) {
+    console.error('❌ Error buscando producto:', error);
+    res.status(500).json({ message: 'Error interno' });
   }
 };
 
 /* ---------------- GET PRODUCTOS ---------------- */
-
-router.get('/', async (req,res)=>{
-  try{
-
+router.get('/', async (req, res) => {
+  try {
     const { page, limit, search, categoria, destacados } = req.query;
-
     const whereClause = {};
 
-    if(categoria) whereClause.categoria = categoria;
+    if (categoria) whereClause.categoria = categoria;
+    if (destacados === 'true') whereClause.destacados = true;
 
-    if(destacados === "true") whereClause.destacados = true;
-
-    // ✅ FIX: sin LOWER ni sequelize.fn (rompía en producción)
     if (search) {
       whereClause[Op.or] = [
         { nombre: { [Op.like]: `%${search}%` } },
@@ -60,179 +59,124 @@ router.get('/', async (req,res)=>{
       ];
     }
 
-    const queryOptions = {
-      where: whereClause,
-      order: [['createdAt','DESC']]
-    };
+    const queryOptions = { where: whereClause, order: [['createdAt', 'DESC']] };
 
-    // ✅ FIX: parseo seguro
-    const parsedLimit = limit ? parseInt(limit) : null;
-    const parsedPage = page ? parseInt(page) : null;
+    const parsedLimit = !isNaN(parseInt(limit)) ? parseInt(limit) : null;
+    const parsedPage = !isNaN(parseInt(page)) ? parseInt(page) : null;
 
-    if(parsedPage && parsedLimit){
-
+    if (parsedPage !== null && parsedLimit !== null) {
       queryOptions.limit = parsedLimit;
       queryOptions.offset = (parsedPage - 1) * parsedLimit;
-
       const result = await Product.findAndCountAll(queryOptions);
-
       return res.json({
         products: result.rows,
         currentPage: parsedPage,
         totalPages: Math.ceil(result.count / parsedLimit),
         totalProducts: result.count
       });
-
     }
 
     const result = await Product.findAll(queryOptions);
+    res.json({ products: result, totalProducts: result.length });
 
-    res.json({
-      products: result,
-      totalProducts: result.length
-    });
-
-  }catch(error){
-
-    console.error("🔥 Error obteniendo productos:", error);
-
-    res.status(500).json({message:'Error al obtener productos'});
-
+  } catch (error) {
+    console.error('🔥 Error obteniendo productos:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
 /* ---------------- GET POR ID ---------------- */
-
-router.get('/:id', loadProduct, (req,res)=>{
+router.get('/:id', loadProduct, (req, res) => {
   res.json(req.product);
 });
 
 /* ---------------- CREAR PRODUCTO ---------------- */
-
-router.post('/', authenticate, upload.single('image'), validateProduct, async (req,res)=>{
-
-  try{
-
+router.post('/', authenticate, upload.single('image'), validateProduct, async (req, res) => {
+  try {
     let imageUrl = req.body.imageUrl || null;
     let imagePublicId = req.body.imagePublicId || null;
 
-    if(req.file){
-
-      const result = await cloudinary.uploader.upload(req.file.path,{
-        folder:'productos'
-      });
-
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, { folder: 'productos' });
       imageUrl = result.secure_url;
       imagePublicId = result.public_id;
-
     }
 
     const precioFloat = parseFloat(
-      req.body.precio.toString().replace(/\./g,'').replace(',','.')
+      req.body.precio.toString().replace(/\./g, '').replace(',', '.')
     );
 
     const newProduct = await Product.create({
-
-      nombre:req.body.nombre,
-      precio:precioFloat,
-      descripcion:req.body.descripcion || null,
-      categoria:req.body.categoria,
-      subcategoria:req.body.subcategoria || null,
-      talles:req.body.talles || null,
-      colores:req.body.colores || null,
-      medidas:req.body.medidas || null,
-      destacados:req.body.destacados || false,
-      estado:req.body.estado || 'activo',
+      nombre: req.body.nombre,
+      precio: precioFloat,
+      descripcion: req.body.descripcion || null,
+      categoria: req.body.categoria,
+      subcategoria: req.body.subcategoria || null,
+      talles: req.body.talles || null,
+      colores: req.body.colores || null,
+      medidas: req.body.medidas || null,
+      destacados: req.body.destacados || false,
+      estado: req.body.estado || 'activo',
       imageUrl,
       imagePublicId,
       temporada_coleccion: req.body.temporada_coleccion || null
-
     });
 
     res.status(201).json(newProduct);
-
-  }catch(error){
-
-    console.error("❌ Error creando producto:",error);
-
-    res.status(500).json({message:'Error al crear producto'});
-
+  } catch (error) {
+    console.error('❌ Error creando producto:', error);
+    res.status(500).json({ message: 'Error al crear producto' });
   }
-
 });
 
 /* ---------------- ACTUALIZAR PRODUCTO ---------------- */
-
-router.put('/:id', authenticate, upload.single('image'), loadProduct, validateProduct, async (req,res)=>{
-
-  try{
-
+router.put('/:id', authenticate, upload.single('image'), loadProduct, validateProduct, async (req, res) => {
+  try {
     let imageUrl = req.body.imageUrl || req.product.imageUrl;
     let imagePublicId = req.body.imagePublicId || req.product.imagePublicId;
 
-    if(req.file){
-
-      const result = await cloudinary.uploader.upload(req.file.path,{
-        folder:'productos'
-      });
-
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, { folder: 'productos' });
       imageUrl = result.secure_url;
       imagePublicId = result.public_id;
-
     }
 
     const precioFloat = parseFloat(
-      req.body.precio.toString().replace(/\./g,'').replace(',','.')
+      req.body.precio.toString().replace(/\./g, '').replace(',', '.')
     );
 
     await req.product.update({
-
-      nombre:req.body.nombre,
-      precio:precioFloat,
-      descripcion:req.body.descripcion || null,
-      categoria:req.body.categoria,
-      subcategoria:req.body.subcategoria || null,
-      talles:req.body.talles || null,
-      colores:req.body.colores || null,
-      medidas:req.body.medidas || null,
-      destacados:req.body.destacados || false,
-      estado:req.body.estado || 'activo',
+      nombre: req.body.nombre,
+      precio: precioFloat,
+      descripcion: req.body.descripcion || null,
+      categoria: req.body.categoria,
+      subcategoria: req.body.subcategoria || null,
+      talles: req.body.talles || null,
+      colores: req.body.colores || null,
+      medidas: req.body.medidas || null,
+      destacados: req.body.destacados || false,
+      estado: req.body.estado || 'activo',
       imageUrl,
       imagePublicId,
       temporada_coleccion: req.body.temporada_coleccion || req.product.temporada_coleccion
-
     });
 
     res.json(req.product);
-
-  }catch(error){
-
-    console.error("❌ Error actualizando producto:",error);
-
-    res.status(400).json({message:'Error al actualizar producto'});
-
+  } catch (error) {
+    console.error('❌ Error actualizando producto:', error);
+    res.status(400).json({ message: 'Error al actualizar producto' });
   }
-
 });
 
 /* ---------------- ELIMINAR PRODUCTO ---------------- */
-
-router.delete('/:id', authenticate, loadProduct, async (req,res)=>{
-
-  try{
-
+router.delete('/:id', authenticate, loadProduct, async (req, res) => {
+  try {
     await req.product.destroy();
-
-    res.json({message:'Producto eliminado correctamente'});
-
-  }catch(error){
-
-    console.error("❌ Error eliminando producto:",error);
-
-    res.status(500).json({message:'Error al eliminar producto'});
-
+    res.json({ message: 'Producto eliminado correctamente' });
+  } catch (error) {
+    console.error('❌ Error eliminando producto:', error);
+    res.status(500).json({ message: 'Error al eliminar producto' });
   }
-
 });
 
 export default router;

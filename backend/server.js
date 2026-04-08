@@ -22,27 +22,22 @@ const allowedOrigins = [
   'https://tiendainfantil.vercel.app',
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Postman, server-to-server
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-      console.log('⛔ CORS bloqueado para:', origin);
-      return callback(new Error('CORS no permitido'));
-    },
-    credentials: true,
-  })
-);
-
-// ✅ Preflight FIX
-app.options('*', cors({
-  origin: allowedOrigins,
+    console.log('⛔ CORS bloqueado para:', origin);
+    return callback(null, false); // solo bloquea, sin tirar error
+  },
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Preflight
 
 // -----------------------------
 app.use(express.json());
@@ -79,7 +74,7 @@ app.use((err, req, res, next) => {
 });
 
 // -----------------------------
-// 🚀 ARRANQUE CORRECTO (Railway)
+// 🚀 ARRANQUE
 // -----------------------------
 const PORT = process.env.PORT || 5000;
 
