@@ -46,7 +46,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
-const PORT = process.env.PORT || 8080; // 👈 IMPORTANTE para Railway
+const PORT = process.env.PORT; // 👈 IMPORTANTE para Railway
 
 // 🔗 Conexión DB y arranque
 (async () => {
