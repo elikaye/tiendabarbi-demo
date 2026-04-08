@@ -78,7 +78,7 @@ const ProductoCard = ({ producto }) => {
 
   return (
     <Link
-      to={`/producto/${producto.id}`}
+      to={`/products/${producto.id}`}
       className="
         relative bg-white rounded-xl
         shadow-md hover:shadow-lg
