@@ -14,9 +14,7 @@ export const FrontendSettingsProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  const API =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
-
+  const API = "https://tiendabarbi-demo-production.up.railway.app/api/v1";
   useEffect(() => {
     const fetchSettings = async () => {
       try {
