@@ -64,8 +64,8 @@ app.use((err, req, res, next) => {
 });
 
 // 🔥 PUERTO BIEN MANEJADO
-const PORT = process.env.PORT || 5000;
 
+const PORT = process.env.PORT ? Number(process.env.PORT) : 5000;
 console.log('👉 PORT:', process.env.PORT);
 
 // 🔗 DB + start
