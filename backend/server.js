@@ -71,11 +71,13 @@ console.log('👉 PORT:', process.env.PORT);
 // 🔗 DB + start
 (async () => {
   try {
-    await sequelize.authenticate();
-    console.log('✅ Conectado a MySQL con Sequelize');
+   await sequelize.authenticate();
+console.log('✅ Conectado a MySQL con Sequelize');
 
-    await sequelize.sync();
-    console.log('✅ Tablas sincronizadas');
+// 🚫 NO usar en producción
+// await sequelize.sync();
+
+console.log('✅ DB lista (sin sync)');
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
