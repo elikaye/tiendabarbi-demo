@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 
 // -----------------------------
-// ✅ CORS DEFINITIVO
+// ✅ CORS definitivo (Railway + Local)
 // -----------------------------
 const allowedOrigins = [
   'http://localhost:5173',
@@ -24,16 +24,14 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // Postman, server-to-server
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
+    if (!origin) return callback(null, true); // Postman / server-to-server
+    if (allowedOrigins.includes(origin)) return callback(null, true);
     console.log('⛔ CORS bloqueado para:', origin);
-    return callback(null, false); // solo bloquea, sin tirar error
+    return callback(null, false); // Bloquea pero no tira error
   },
   credentials: true,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
 };
 
 app.use(cors(corsOptions));
@@ -80,9 +78,11 @@ const PORT = process.env.PORT || 5000;
 
 (async () => {
   try {
+    // Solo autenticar DB al inicio
     await sequelize.authenticate();
     console.log('✅ Conectado a MySQL con Sequelize');
 
+    // Escuchar en todas las interfaces para Railway/Vercel
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
       console.log('🌍 NODE_ENV:', process.env.NODE_ENV);
@@ -91,6 +91,6 @@ const PORT = process.env.PORT || 5000;
 
   } catch (error) {
     console.error('❌ Error DB:', error.message);
-    process.exit(1);
+    process.exit(1); // Detener si DB falla
   }
 })();
