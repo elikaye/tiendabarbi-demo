@@ -19,23 +19,28 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5000',
   'https://tiendainfantil.vercel.app',
-];
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+].filter(Boolean);
 
-// ✅ CORS BIEN CONFIGURADO
-app.use(cors({
-  origin: (origin, callback) => {
-    // permitir requests sin origin (postman, etc)
-    if (!origin) return callback(null, true);
+// ✅ CORS CORREGIDO (COMPLETO)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn('🚫 Bloqueado por CORS:', origin);
+        callback(new Error('No permitido por CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    console.log('🚫 CORS bloqueado:', origin);
-    return callback(new Error('No permitido por CORS'));
-  },
-  credentials: true,
-}));
+// 🔥 CLAVE: habilita preflight (ARREGLA CORS + 502)
+app.options('*', cors());
 
 app.use(express.json());
 
@@ -63,21 +68,20 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
-// 🔥 PUERTO BIEN MANEJADO
-
+// 🔥 PUERTO (correcto para Railway)
 const PORT = process.env.PORT ? Number(process.env.PORT) : 5000;
 console.log('👉 PORT:', process.env.PORT);
 
 // 🔗 DB + start
 (async () => {
   try {
-   await sequelize.authenticate();
-console.log('✅ Conectado a MySQL con Sequelize');
+    await sequelize.authenticate();
+    console.log('✅ Conectado a MySQL con Sequelize');
 
-// 🚫 NO usar en producción
-// await sequelize.sync();
+    // 🚫 NO usar en producción
+    // await sequelize.sync();
 
-console.log('✅ DB lista (sin sync)');
+    console.log('✅ DB lista (sin sync)');
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
