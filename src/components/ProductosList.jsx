@@ -39,7 +39,7 @@ export default function ProductosList({ start = 0, limit = MAX_PRODUCTOS }) {
 
   const fetchProductos = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/products?limit=1000`);
+      const res = await fetch(`${API_BASE_URL}/product?limit=1000`);
       if (!res.ok) throw new Error("Error cargando productos");
 
       const data = await res.json();
