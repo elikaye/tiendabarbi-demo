@@ -14,7 +14,9 @@ import frontendSettingsRoutes from './routes/frontendSettingsRoutes.js';
 dotenv.config();
 const app = express();
 
-// 🌐 ORÍGENES PERMITIDOS (LOCAL + VERCEL)
+console.log("🔥 INICIANDO SERVER...");
+
+// 🌐 ORÍGENES PERMITIDOS
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5000',
@@ -22,7 +24,7 @@ const allowedOrigins = [
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
 ].filter(Boolean);
 
-// ✅ CORS CORREGIDO (COMPLETO)
+// ✅ CORS COMPLETO
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -30,7 +32,7 @@ app.use(
         callback(null, true);
       } else {
         console.warn('🚫 Bloqueado por CORS:', origin);
-        callback(new Error('No permitido por CORS'));
+        callback(null, false); // 🔥 IMPORTANTE: NO romper el server
       }
     },
     credentials: true,
@@ -39,7 +41,7 @@ app.use(
   })
 );
 
-// 🔥 CLAVE: habilita preflight (ARREGLA CORS + 502)
+// 🔥 PRE-FLIGHT (CLAVE)
 app.options('*', cors());
 
 app.use(express.json());
@@ -68,27 +70,25 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Error interno del servidor' });
 });
 
-// 🔥 PUERTO (correcto para Railway)
-const PORT = process.env.PORT ? Number(process.env.PORT) : 5000;
-console.log('👉 PORT:', process.env.PORT);
+// 🔥 PUERTO
+const PORT = process.env.PORT || 5000;
 
-// 🔗 DB + start
+// 🚀 ARRANQUE ROBUSTO (ANTI-502)
 (async () => {
   try {
+    console.log("👉 Intentando conectar DB...");
+    
     await sequelize.authenticate();
-    console.log('✅ Conectado a MySQL con Sequelize');
-
-    // 🚫 NO usar en producción
-    // await sequelize.sync();
-
-    console.log('✅ DB lista (sin sync)');
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-    });
+    
+    console.log('✅ DB conectada correctamente');
 
   } catch (error) {
-    console.error('❌ Error al conectar con Sequelize:', error.message);
-    process.exit(1);
+    console.error('❌ ERROR DB:', error.message);
+    console.log('⚠️ CONTINUANDO SIN DB (para evitar 502)');
   }
+
+  // 🔥 EL SERVER SIEMPRE ARRANCA (aunque falle la DB)
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  });
 })();
