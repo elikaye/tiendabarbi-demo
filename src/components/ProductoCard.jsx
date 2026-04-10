@@ -16,6 +16,9 @@ const ProductoCard = ({ producto }) => {
 
   if (!producto) return null;
 
+  // 🔥 FIX CLAVE: ID consistente
+  const productId = producto.id || producto._id;
+
   const esActivo = producto.estado === "activo";
 
   const isFavorito = Array.isArray(favoritos)
@@ -25,7 +28,7 @@ const ProductoCard = ({ producto }) => {
           f?.producto?.id ||
           f?.id ||
           f?._id
-        )?.toString() === producto.id?.toString()
+        )?.toString() === productId?.toString()
       )
     : false;
 
@@ -37,7 +40,7 @@ const ProductoCard = ({ producto }) => {
     ];
 
     setHearts(nuevos);
-    setTimeout(() => setHearts([]), 500); // 🔥 más rápido
+    setTimeout(() => setHearts([]), 500);
   };
 
   const toggleFavorito = async (e) => {
@@ -54,7 +57,7 @@ const ProductoCard = ({ producto }) => {
 
     try {
       if (isFavorito) {
-        await eliminarFavorito(producto.id);
+        await eliminarFavorito(productId);
       } else {
         await agregarFavorito(producto);
         lanzarCorazones();
@@ -78,7 +81,7 @@ const ProductoCard = ({ producto }) => {
 
   return (
     <Link
-      to={`/products/${producto.id}`}
+      to={`/products/${productId}`} // 🔥 FIX ACÁ
       className="
         relative bg-white rounded-xl
         shadow-md hover:shadow-lg
@@ -142,7 +145,7 @@ const ProductoCard = ({ producto }) => {
         ${precioFormateado}
       </p>
 
-      {/* 🔘 BOTÓN MEJORADO */}
+      {/* 🔘 BOTÓN */}
       {esActivo ? (
         <div className="mt-3 flex justify-center">
           <span
