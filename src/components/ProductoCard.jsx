@@ -80,8 +80,8 @@ const ProductoCard = ({ producto }) => {
   );
 
   return (
-    <Link
-      to={`/products/${productId}`} // 🔥 FIX ACÁ
+  <Link to={`/producto/${productId}`}
+     
       className="
         relative bg-white rounded-xl
         shadow-md hover:shadow-lg
